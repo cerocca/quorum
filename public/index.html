@@ -134,6 +134,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     <button class="load-models-btn" onclick="loadModels()">↻ Load models</button>
   </div>
 
+  <!-- Judge mode -->
+  <div class="agents-section">
+    <div class="sec-label">Judge mode</div>
+    <div class="agents-grid" style="grid-template-columns:repeat(2,1fr)" id="modeGrid"></div>
+  </div>
+
   <!-- Agents -->
   <div class="agents-section">
     <div class="sec-label">Agents — select 3 to 5</div>
@@ -184,29 +190,56 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     </div>
 
     <div>
+      <div class="phase-label">Phase 4 — Pre-mortem</div>
+      <div id="premortOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <div>
       <button class="reset-btn" onclick="resetPanel()">← New decision</button>
     </div>
   </div>
 
 </div>
 <script>
+const BIAS_COLOR = { skeptic:'#ff5a5a', advocate:'#e8ff5a', investigative:'#5ab8ff' };
+
 const AGENTS = [
-  {id:'devil', name:"Devil's Advocate", desc:"Challenges every assumption", color:'#ff5a5a',
-   system:`You are a Devil's Advocate. Challenge every assumption, find logical gaps, argue against the decision. Be adversarial but rigorous. Format: **Position** (1 sentence) then **Key challenges** (3 bullet points max).`},
-  {id:'risk',  name:"Risk Assessor",    desc:"Surfaces failure modes",      color:'#ff9f5a',
-   system:`You are a Risk Assessor. Identify failure modes, tail risks, worst-case scenarios. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max with severity).`},
-  {id:'expert',name:"Domain Expert",    desc:"Evaluates feasibility",        color:'#5ab8ff',
-   system:`You are a Domain Expert. Evaluate technical and operational feasibility. Flag knowledge gaps. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max).`},
-  {id:'optimist',name:"Optimist",       desc:"Finds upside & opportunities", color:'#e8ff5a',
-   system:`You are an Optimist. Identify best-case scenarios, undervalued opportunities, strengths. Format: **Upside potential** (1 sentence) then **Key opportunities** (3 bullet points max).`},
-  {id:'strategist',name:"Strategist",   desc:"Long-term alignment",          color:'#b85aff',
-   system:`You are a Strategist. Evaluate alignment with long-term goals and competitive positioning. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`},
-  {id:'ethicist',name:"Ethicist",       desc:"Compliance & values",          color:'#5affb8',
-   system:`You are an Ethicist/Regulator. Flag compliance issues, ethical concerns, reputational risks, stakeholder impacts. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max).`},
+  {id:'devil', name:"Devil's Advocate", desc:"Challenges every assumption", bias:'skeptic', color:'#ff5a5a',
+   system:`You are a Devil's Advocate with a skeptic bias. Your role is adversarial: dismantle every assumption, expose logical gaps, argue against the decision as if your job is to kill it. Do not soften your critique. Format: **Position** (1 sentence against) then **Key challenges** (3 bullet points max, each targeting a specific assumption).`},
+  {id:'risk',  name:"Risk Assessor",    desc:"Surfaces failure modes",      bias:'investigative', color:'#ff9f5a',
+   system:`You are a Risk Assessor with an investigative bias. Seek out failure modes aggressively. Treat absence of evidence as suspicious, not reassuring. Assume things will go wrong unless proven otherwise. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max, each with severity and specific failure path).`},
+  {id:'expert',name:"Domain Expert",    desc:"Evaluates feasibility",        bias:'investigative', color:'#5ab8ff',
+   system:`You are a Domain Expert with an investigative bias. Evaluate technical and operational feasibility by probing every gap. Flag missing information, unproven assumptions, and hidden complexity. Do not give the benefit of the doubt. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max, prioritize gaps and unknowns).`},
+  {id:'optimist',name:"Optimist",       desc:"Finds upside & opportunities", bias:'advocate', color:'#e8ff5a',
+   system:`You are an Optimist with an advocate bias. Defend the decision. Find the undervalued upside, the overlooked opportunity, the asymmetric gain. Make the strongest possible case for moving forward. Format: **Upside potential** (1 sentence, make it compelling) then **Key opportunities** (3 bullet points max, be specific about value).`},
+  {id:'strategist',name:"Strategist",   desc:"Long-term alignment",          bias:'advocate', color:'#b85aff',
+   system:`You are a Strategist with an advocate bias. Argue for strategic alignment when defensible. Frame the decision in terms of long-term positioning and competitive advantage. If alignment is weak, say so briefly, but spend most effort on making the strongest strategic case. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`},
+  {id:'ethicist',name:"Ethicist",       desc:"Compliance & values",          bias:'skeptic', color:'#5affb8',
+   system:`You are an Ethicist/Regulator with a skeptic bias. Assume hidden risks until proven otherwise. Probe for compliance issues, ethical blind spots, reputational exposure, and stakeholder harm. Default to concern. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max, name specific stakeholders or regulations at risk).`},
 ];
+
+const JUDGE_MODES = {
+  analyst: {
+    label: 'Analyst',
+    desc: 'Balanced — weighs all inputs equally',
+    critSystem: 'You are a sharp, balanced debate moderator. Weigh all perspectives equally. No fluff.',
+    critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nIdentify: 1) 2-3 strongest consensus points, 2) 2-3 sharpest disagreements, 3) blind spots none addressed. Be concise.`,
+    synthSystem: 'You are a decisive, balanced executive. Weigh all inputs before giving your verdict.',
+    synthPrompt: (decision, block, critique) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n2. Top 3 risks to monitor\n3. Recommended next step (1 sentence)`,
+  },
+  sentinel: {
+    label: 'Sentinel',
+    desc: 'Risk-first — defaults to NO-GO under uncertainty',
+    critSystem: 'You are a strict, risk-focused debate moderator. Prioritize downside scenarios. When in doubt, surface the risk. No fluff.',
+    critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nFocus on: 1) 2-3 most critical risks raised, 2) disagreements where the pessimistic view may be correct, 3) red flags that optimistic agents may have downplayed. Be concise.`,
+    synthSystem: 'You are a risk-first executive. Your default is NO-GO unless evidence strongly supports proceeding. Uncertainty is not a reason to proceed.',
+    synthPrompt: (decision, block, critique) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n   Default to NO-GO if significant uncertainty remains.\n2. Top 3 risks that must be resolved before proceeding\n3. Minimum conditions required for a GO verdict (1-2 sentences)`,
+  },
+};
 
 let selectedAgents = new Set(['devil','risk','expert']);
 let selectedModel  = 'anthropic/claude-sonnet-4-5';
+let selectedMode   = 'analyst';
 let allModels      = [];
 
 // ── Model search ──────────────────────────────────────────
@@ -255,15 +288,34 @@ function selectModel(id){
   modelDropdown.classList.remove('open');
 }
 
+// ── Judge modes ───────────────────────────────────────────
+function renderModes(){
+  document.getElementById('modeGrid').innerHTML = Object.entries(JUDGE_MODES).map(([key, m])=>{
+    const active = selectedMode === key;
+    return `<div class="agent-card ${active?'active':''}" onclick="selectMode('${key}')">
+      <div class="agent-check">${active?'✓':''}</div>
+      <div class="agent-name" style="color:${active?'var(--accent)':'var(--text)'}">${m.label}</div>
+      <div class="agent-desc">${m.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectMode(key){
+  selectedMode = key;
+  renderModes();
+}
+
 // ── Agents ────────────────────────────────────────────────
 function renderAgents(){
   document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
     const active  = selectedAgents.has(a.id);
     const locked  = !active && selectedAgents.size >= 5;
+    const bc      = BIAS_COLOR[a.bias];
     return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
       <div class="agent-check">${active?'✓':''}</div>
       <div class="agent-name" style="color:${active?a.color:'var(--text)'}">${a.name}</div>
       <div class="agent-desc">${a.desc}</div>
+      <div style="margin-top:5px;display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:1px 6px;border-radius:2px;background:${bc};color:#000">${a.bias}</div>
     </div>`;
   }).join('');
   const n = selectedAgents.size;
@@ -304,7 +356,7 @@ async function runPanel(){
   const context = document.getElementById('contextInput').value.trim();
   const decisionBlock = `Decision: ${decision}${context?'\n\nContext: '+context:''}`;
 
-  // Build output cards
+  // Build phase 1 output cards
   const outEl = document.getElementById('agentOutputs');
   outEl.innerHTML = agents.map(a=>`
     <div class="agent-out running" id="ao-${a.id}">
@@ -336,6 +388,7 @@ async function runPanel(){
   }));
 
   // Phase 2 — cross-critique
+  const mode     = JUDGE_MODES[selectedMode];
   const critDot  = document.getElementById('critDot');
   const critBody = document.getElementById('critBody');
   critDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
@@ -347,8 +400,8 @@ async function runPanel(){
   let critique = '';
   try{
     critique = await callProxy([
-      {role:'system', content:'You are a sharp, concise debate moderator. No fluff.'},
-      {role:'user',   content:`Decision: ${decision}\n\nAgent analyses:\n${analysesBlock}\n\nIdentify: 1) 2-3 strongest consensus points, 2) 2-3 sharpest disagreements, 3) blind spots none addressed. Be concise.`}
+      {role:'system', content: mode.critSystem},
+      {role:'user',   content: mode.critPrompt(decision, analysesBlock)}
     ]);
     critBody.textContent = critique;
     critDot.style.cssText = 'background:var(--accent2);animation:none';
@@ -366,8 +419,8 @@ async function runPanel(){
 
   try{
     const synth = await callProxy([
-      {role:'system', content:'You are a decisive executive. Give clear verdicts with concise reasoning.'},
-      {role:'user',   content:`Decision: ${decision}\n\nAgent analyses:\n${analysesBlock}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n2. Top 3 risks to monitor\n3. Recommended next step (1 sentence)`}
+      {role:'system', content: mode.synthSystem},
+      {role:'user',   content: mode.synthPrompt(decision, analysesBlock, critique)}
     ]);
 
     const firstLine = synth.split('\n')[0]||'';
@@ -383,12 +436,40 @@ async function runPanel(){
     synthBody.textContent = `Error: ${e.message}`;
     synthDot.style.cssText = 'background:var(--danger);animation:none';
   }
+
+  // Phase 4 — pre-mortem (parallel)
+  const pmEl = document.getElementById('premortOutputs');
+  pmEl.innerHTML = agents.map(a=>`
+    <div class="agent-out running" id="pm-${a.id}">
+      <div class="agent-out-head">
+        <span class="agent-badge">${a.name}</span>
+        <span class="agent-out-desc">${a.desc}</span>
+        <div class="status-dot"></div>
+      </div>
+      <div class="agent-out-body empty" id="pb-${a.id}">Analyzing…</div>
+    </div>`).join('');
+
+  await Promise.all(agents.map(async a=>{
+    try{
+      const res = await callProxy([
+        {role:'system', content: a.system},
+        {role:'user',   content: `It is 12 months from now. This decision has failed.\n\n${decisionBlock}\n\nFrom your perspective (${a.name}, bias: ${a.bias}), what caused the failure? Max 3 bullet points, be specific.`}
+      ]);
+      document.getElementById(`pb-${a.id}`).textContent = res;
+      document.getElementById(`pb-${a.id}`).classList.remove('empty');
+      document.getElementById(`pm-${a.id}`).className = 'agent-out done';
+    }catch(e){
+      document.getElementById(`pb-${a.id}`).textContent = `Error: ${e.message}`;
+      document.getElementById(`pm-${a.id}`).className = 'agent-out error';
+    }
+  }));
 }
 
 function resetPanel(){
   document.getElementById('pipeline').style.display = 'none';
   document.getElementById('runBtn').disabled = false;
   document.getElementById('agentOutputs').innerHTML = '';
+  document.getElementById('premortOutputs').innerHTML = '';
   ['critBody','synthBody'].forEach(id=>{
     const el = document.getElementById(id);
     el.textContent = 'Waiting…';
@@ -400,6 +481,7 @@ function resetPanel(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+renderModes();
 renderAgents();
 </script>
 </body>

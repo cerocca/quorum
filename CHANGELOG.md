@@ -1,5 +1,16 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v2 — Agent bias, Judge modes, Pre-mortem
+*2026-05-26*
+
+- Added bias property to all 6 agents (skeptic / advocate / investigative)
+- Rewrote all agent system prompts with declared bias framing
+- Added bias badge on each agent card (color-coded)
+- Added JUDGE_MODES: Analyst (balanced) and Sentinel (risk-first, default NO-GO)
+- Added Judge mode selector in UI
+- Added Phase 4: Pre-mortem — each agent answers what caused the failure in 12 months
+- resetPanel() updated to clear Phase 4 outputs
+
 ## v2-infra — Docker stack
 *2026-05-26*
 

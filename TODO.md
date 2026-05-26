@@ -19,18 +19,6 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 
 ## v2 — Bias agenti + Judge modes + Pre-mortem + Stack Docker
 
-### Frontend (`public/index.html`)
-- [ ] Bias dichiarato per agente nel system prompt (skeptic / advocate / investigative)
-- [ ] Badge bias visibile sulla agent card
-- [ ] Judge mode selector nella UI (Analyst / Sentinel)
-- [ ] System prompt del Judge varia in base al mode selezionato
-- [ ] Fase 4: Pre-mortem — ogni agente risponde "cosa ha causato il fallimento in 12 mesi?"
-- [ ] Sezione Phase 4 nel pipeline HTML
-- [ ] Rimozione API key dall'UI (gestita lato server)
-
-### Infrastruttura
-- [ ] Test pipeline completa (tutte e 4 le fasi)
-
 ### Chiusura sessione
 - [ ] Commit: `v2 — bias agenti, judge modes, pre-mortem, stack Docker`
 
@@ -56,6 +44,7 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 - [ ] Integrazione webhook (es. notifica Telegram al termine)
 - [ ] Persistenza server-side con SQLite (alternativa a localStorage)
 - [ ] Supporto multi-utente (autenticazione base, fuori scope LAN-only per ora)
+- [ ] Bias per agente selezionabile dall'utente (toggle skeptic/advocate/investigative su ogni card) — valutare se aggiunge valore o confusione
 
 ---
 
