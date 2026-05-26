@@ -111,6 +111,14 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 .reset-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s}
 .reset-btn:hover{border-color:var(--text);color:var(--text)}
+
+/* Collapsible cards */
+.agent-out .status-dot{margin-left:0}
+.agent-chevron{margin-left:auto;font-size:10px;color:var(--muted);user-select:none}
+.agent-out:not(.running) .agent-out-head{cursor:pointer}
+.agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
+.agent-out.collapsed .agent-out-body{display:none}
+.agent-out.collapsed .agent-out-head{border-bottom:none}
 </style>
 </head>
 <body>
@@ -118,7 +126,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
   <div class="header">
     <h1>Quorum</h1>
-    <span class="tag">multi-agent</span>
+    <span class="tag">multi-agent decision panel</span>
   </div>
 
   <!-- Model selector -->
@@ -140,9 +148,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     <div class="agents-grid" style="grid-template-columns:repeat(2,1fr)" id="modeGrid"></div>
   </div>
 
+  <!-- Engagement tier -->
+  <div class="agents-section">
+    <div class="sec-label">Engagement tier</div>
+    <div class="agents-grid" style="grid-template-columns:repeat(2,1fr)" id="tierGrid"></div>
+  </div>
+
   <!-- Agents -->
   <div class="agents-section">
-    <div class="sec-label">Agents — select 3 to 5</div>
+    <div class="sec-label" id="agentsSectionLabel">Agents — select 3 to 5</div>
     <div class="agents-grid" id="agentsGrid"></div>
     <div class="agents-note" id="agentsNote"></div>
   </div>
@@ -167,7 +181,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       <div id="agentOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
-    <div>
+    <div id="phase2">
       <div class="phase-label">Phase 2 — Cross-critique</div>
       <div class="block-out critique">
         <div class="block-head">
@@ -189,7 +203,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       </div>
     </div>
 
-    <div>
+    <div id="phase4">
       <div class="phase-label">Phase 4 — Pre-mortem</div>
       <div id="premortOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
@@ -237,9 +251,15 @@ const JUDGE_MODES = {
   },
 };
 
+const TIERS = {
+  full:  { label: 'Full',  desc: 'All phases — analysis, critique, synthesis, pre-mortem' },
+  quick: { label: 'Quick', desc: '3 agents — Phase 1 & 3 only, no critique or pre-mortem' },
+};
+
 let selectedAgents = new Set(['devil','risk','expert']);
 let selectedModel  = 'anthropic/claude-sonnet-4-5';
 let selectedMode   = 'analyst';
+let selectedTier   = 'full';
 let allModels      = [];
 
 // ── Model search ──────────────────────────────────────────
@@ -305,11 +325,34 @@ function selectMode(key){
   renderModes();
 }
 
+// ── Engagement tier ───────────────────────────────────────
+function renderTiers(){
+  document.getElementById('tierGrid').innerHTML = Object.entries(TIERS).map(([key, t])=>{
+    const active = selectedTier === key;
+    return `<div class="agent-card ${active?'active':''}" onclick="selectTier('${key}')">
+      <div class="agent-check">${active?'✓':''}</div>
+      <div class="agent-name" style="color:${active?'var(--accent)':'var(--text)'}">${t.label}</div>
+      <div class="agent-desc">${t.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectTier(key){
+  selectedTier = key;
+  if(key === 'quick'){
+    const arr = [...selectedAgents];
+    if(arr.length > 3) selectedAgents = new Set(arr.slice(0,3));
+  }
+  renderTiers();
+  renderAgents();
+}
+
 // ── Agents ────────────────────────────────────────────────
 function renderAgents(){
+  const maxAgents = selectedTier === 'quick' ? 3 : 5;
   document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
     const active  = selectedAgents.has(a.id);
-    const locked  = !active && selectedAgents.size >= 5;
+    const locked  = !active && selectedAgents.size >= maxAgents;
     const bc      = BIAS_COLOR[a.bias];
     return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
       <div class="agent-check">${active?'✓':''}</div>
@@ -318,16 +361,28 @@ function renderAgents(){
       <div style="margin-top:5px;display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:1px 6px;border-radius:2px;background:${bc};color:#000">${a.bias}</div>
     </div>`;
   }).join('');
+  document.getElementById('agentsSectionLabel').textContent =
+    selectedTier === 'quick' ? 'Agents — exactly 3' : 'Agents — select 3 to 5';
   const n = selectedAgents.size;
   document.getElementById('agentsNote').textContent =
     n < 3 ? `Select ${3-n} more agent${3-n>1?'s':''} to continue` :
+    selectedTier === 'quick' ? `${n} agents selected (Quick mode)` :
     `${n} agent${n>1?'s':''} selected${n===5?' (maximum)':''}`;
 }
 
 function toggleAgent(id){
+  const maxAgents = selectedTier === 'quick' ? 3 : 5;
   if(selectedAgents.has(id)){ if(selectedAgents.size<=3) return; selectedAgents.delete(id); }
-  else { if(selectedAgents.size>=5) return; selectedAgents.add(id); }
+  else { if(selectedAgents.size>=maxAgents) return; selectedAgents.add(id); }
   renderAgents();
+}
+
+// ── Collapsible cards ─────────────────────────────────────
+function toggleCard(cardId){
+  const card = document.getElementById(cardId);
+  if(!card || card.classList.contains('running')) return;
+  const collapsed = card.classList.toggle('collapsed');
+  card.querySelector('.agent-chevron').textContent = collapsed ? '▶' : '▼';
 }
 
 // ── API proxy calls ───────────────────────────────────────
@@ -350,6 +405,8 @@ async function runPanel(){
 
   document.getElementById('pipeline').style.display = 'flex';
   document.getElementById('runBtn').disabled = true;
+  document.getElementById('phase2').style.display = selectedTier === 'quick' ? 'none' : '';
+  document.getElementById('phase4').style.display = selectedTier === 'quick' ? 'none' : '';
   window.scrollBy({top:200,behavior:'smooth'});
 
   const agents = AGENTS.filter(a => selectedAgents.has(a.id));
@@ -360,9 +417,10 @@ async function runPanel(){
   const outEl = document.getElementById('agentOutputs');
   outEl.innerHTML = agents.map(a=>`
     <div class="agent-out running" id="ao-${a.id}">
-      <div class="agent-out-head">
+      <div class="agent-out-head" onclick="toggleCard('ao-${a.id}')">
         <span class="agent-badge">${a.name}</span>
         <span class="agent-out-desc">${a.desc}</span>
+        <span class="agent-chevron">▼</span>
         <div class="status-dot"></div>
       </div>
       <div class="agent-out-body empty" id="ab-${a.id}">Analyzing…</div>
@@ -379,7 +437,9 @@ async function runPanel(){
       results[a.id] = res;
       document.getElementById(`ab-${a.id}`).textContent = res;
       document.getElementById(`ab-${a.id}`).classList.remove('empty');
-      document.getElementById(`ao-${a.id}`).className = 'agent-out done';
+      const card = document.getElementById(`ao-${a.id}`);
+      card.className = 'agent-out done collapsed';
+      card.querySelector('.agent-chevron').textContent = '▶';
     }catch(e){
       results[a.id] = `Error: ${e.message}`;
       document.getElementById(`ab-${a.id}`).textContent = results[a.id];
@@ -387,15 +447,42 @@ async function runPanel(){
     }
   }));
 
+  const mode          = JUDGE_MODES[selectedMode];
+  const analysesBlock = agents.map(a=>`[${a.name}]:\n${results[a.id]}`).join('\n\n---\n\n');
+
+  // Quick tier: skip Phase 2 and Phase 4
+  if(selectedTier === 'quick'){
+    const synthDot  = document.getElementById('synthDot');
+    const synthBody = document.getElementById('synthBody');
+    synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+    synthBody.classList.remove('empty');
+    synthBody.textContent = 'Synthesizing…';
+    try{
+      const synth = await callProxy([
+        {role:'system', content: mode.synthSystem},
+        {role:'user',   content: mode.synthPrompt(decision, analysesBlock, '')}
+      ]);
+      const firstLine = synth.split('\n')[0]||'';
+      let vclass = 'conditional';
+      if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
+      else if(/NO-GO/.test(firstLine)) vclass = 'nogo';
+      synthBody.classList.remove('empty');
+      synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
+        `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
+      synthDot.style.cssText = 'background:var(--accent2);animation:none';
+    }catch(e){
+      synthBody.textContent = `Error: ${e.message}`;
+      synthDot.style.cssText = 'background:var(--danger);animation:none';
+    }
+    return;
+  }
+
   // Phase 2 — cross-critique
-  const mode     = JUDGE_MODES[selectedMode];
   const critDot  = document.getElementById('critDot');
   const critBody = document.getElementById('critBody');
   critDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
   critBody.classList.remove('empty');
   critBody.textContent = 'Analyzing…';
-
-  const analysesBlock = agents.map(a=>`[${a.name}]:\n${results[a.id]}`).join('\n\n---\n\n');
 
   let critique = '';
   try{
@@ -441,9 +528,10 @@ async function runPanel(){
   const pmEl = document.getElementById('premortOutputs');
   pmEl.innerHTML = agents.map(a=>`
     <div class="agent-out running" id="pm-${a.id}">
-      <div class="agent-out-head">
+      <div class="agent-out-head" onclick="toggleCard('pm-${a.id}')">
         <span class="agent-badge">${a.name}</span>
         <span class="agent-out-desc">${a.desc}</span>
+        <span class="agent-chevron">▼</span>
         <div class="status-dot"></div>
       </div>
       <div class="agent-out-body empty" id="pb-${a.id}">Analyzing…</div>
@@ -457,7 +545,9 @@ async function runPanel(){
       ]);
       document.getElementById(`pb-${a.id}`).textContent = res;
       document.getElementById(`pb-${a.id}`).classList.remove('empty');
-      document.getElementById(`pm-${a.id}`).className = 'agent-out done';
+      const card = document.getElementById(`pm-${a.id}`);
+      card.className = 'agent-out done collapsed';
+      card.querySelector('.agent-chevron').textContent = '▶';
     }catch(e){
       document.getElementById(`pb-${a.id}`).textContent = `Error: ${e.message}`;
       document.getElementById(`pm-${a.id}`).className = 'agent-out error';
@@ -482,6 +572,7 @@ function resetPanel(){
 }
 
 renderModes();
+renderTiers();
 renderAgents();
 </script>
 </body>

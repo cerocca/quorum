@@ -1,5 +1,14 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v2.1 — Engagement tier + Collapsible cards
+*2026-05-26*
+
+- Added Engagement tier selector: Quick (3 agents, Phase 1+3 only) vs Full (all phases)
+- Quick mode locks agent selection to exactly 3
+- Added collapsible agent output cards with chevron indicator
+- Cards auto-collapse when done, stay expanded while running
+- Error cards stay visible by default
+
 ## v2 — Agent bias, Judge modes, Pre-mortem
 *2026-05-26*
 

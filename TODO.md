@@ -25,6 +25,7 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 - [ ] Supporto multi-utente (autenticazione base, fuori scope LAN-only per ora)
 - [ ] Bias per agente selezionabile dall'utente (toggle skeptic/advocate/investigative su ogni card) — valutare se aggiunge valore o confusione
 - [ ] Company profile: persistent context per user — requires authentication first
+- [ ] Quick mode agent swap: deseleziona uno → selezionane un altro senza passare a Full
 
 ---
 
