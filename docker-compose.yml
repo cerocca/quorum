@@ -1,0 +1,8 @@
+services:
+  quorum:
+    build: .
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env
+    restart: unless-stopped

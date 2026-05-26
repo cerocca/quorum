@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Decision Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;
+  --accent:#e8ff5a;--accent2:#5affb8;--danger:#ff5a5a;
+  --text:#f0f0f0;--muted:#555;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+
+.app{max-width:860px;margin:0 auto;padding:32px 20px 80px}
+
+/* Header */
+.header{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.header h1{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.header .tag{font-family:var(--mono);font-size:10px;background:var(--accent);color:#000;padding:2px 8px;border-radius:2px;font-weight:500;letter-spacing:.05em}
+
+/* Section label */
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+/* Model selector */
+.model-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.model-wrap{flex:1;min-width:200px;position:relative}
+.model-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:4px;outline:none;transition:border .15s}
+.model-input:focus{border-color:var(--accent)}
+.model-input::placeholder{color:#444}
+.model-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a1a1a;border:1px solid var(--border);border-radius:6px;max-height:240px;overflow-y:auto;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.model-dropdown.open{display:block}
+.model-opt{padding:9px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;border-bottom:1px solid #1e1e1e;transition:background .1s}
+.model-opt:hover{background:#222}
+.model-opt .mid{color:var(--accent);font-size:10px;margin-top:2px}
+.model-opt .mprice{color:var(--muted);font-size:10px;float:right}
+.model-opt:last-child{border:none}
+.model-status{font-family:var(--mono);font-size:11px;color:var(--muted);padding:12px}
+.model-selected-label{font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:5px}
+.load-models-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:9px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;align-self:flex-start;margin-top:18px}
+.load-models-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Agents */
+.agents-section{margin-bottom:20px}
+.agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:520px){.agents-grid{grid-template-columns:repeat(2,1fr)}}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px 13px;cursor:pointer;transition:all .15s;user-select:none;position:relative}
+.agent-card.active{border-color:var(--accent);background:#171a00}
+.agent-card.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
+.agent-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.agent-desc{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.4}
+.agent-check{position:absolute;top:9px;right:9px;width:14px;height:14px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
+.agent-card.active .agent-check{background:var(--accent);border-color:var(--accent);color:#000}
+.agents-note{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px}
+
+/* Inputs */
+.input-section{margin-bottom:20px}
+.input-section label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px}
+.input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55}
+.input-section textarea:focus{border-color:var(--accent)}
+.input-section textarea::placeholder{color:#3a3a3a}
+
+/* Run */
+.run-btn{width:100%;background:var(--accent);color:#000;border:none;font-family:var(--sans);font-size:14px;font-weight:700;padding:15px;border-radius:6px;cursor:pointer;letter-spacing:.03em;transition:all .15s;margin-bottom:28px}
+.run-btn:hover:not(:disabled){background:#d4e84f;transform:translateY(-1px)}
+.run-btn:disabled{background:#252525;color:#444;cursor:not-allowed;transform:none}
+
+/* Pipeline */
+.pipeline{display:flex;flex-direction:column;gap:20px}
+.phase-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.phase-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Agent outputs */
+.agent-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s}
+.agent-out.running{border-color:var(--accent)}
+.agent-out.done{border-color:#223318}
+.agent-out.error{border-color:var(--danger)}
+.agent-out-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.agent-badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:2px;background:#222;color:var(--muted);transition:all .3s}
+.agent-out.running .agent-badge{background:var(--accent);color:#000}
+.agent-out.done .agent-badge{background:#1e3310;color:var(--accent2)}
+.agent-out.error .agent-badge{background:#3a1010;color:var(--danger)}
+.agent-out-desc{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--border);margin-left:auto;transition:background .3s}
+.agent-out.running .status-dot{background:var(--accent);animation:pulse 1s infinite}
+.agent-out.done .status-dot{background:var(--accent2);animation:none}
+.agent-out.error .status-dot{background:var(--danger);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.agent-out-body{padding:14px 16px;font-size:13px;line-height:1.65;color:#ccc;min-height:44px;white-space:pre-wrap}
+.agent-out-body.empty{color:#333;font-family:var(--mono);font-size:11px}
+
+/* Critique + Synth */
+.block-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.block-out.critique{border-color:#1a2535}
+.block-out.synth{border-color:#1a3525}
+.block-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.block-head-label{font-family:var(--mono);font-size:11px;font-weight:500}
+.critique .block-head-label{color:#5ab0ff}
+.synth .block-head-label{color:var(--accent2)}
+.block-body{padding:16px;font-size:13px;line-height:1.7;color:#ccc;white-space:pre-wrap}
+.block-body.empty{color:#333;font-family:var(--mono);font-size:11px}
+
+/* Verdict */
+.verdict-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-family:var(--mono);font-size:12px;font-weight:500;margin-bottom:14px}
+.verdict-pill.go{background:#1a3310;color:var(--accent2);border:1px solid #2a5525}
+.verdict-pill.nogo{background:#3a1010;color:var(--danger);border:1px solid #5a2525}
+.verdict-pill.conditional{background:#2a2010;color:#ffcc5a;border:1px solid #4a3820}
+
+.reset-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s}
+.reset-btn:hover{border-color:var(--text);color:var(--text)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>Decision Panel</h1>
+    <span class="tag">multi-agent</span>
+  </div>
+
+  <!-- Model selector -->
+  <div class="sec-label">Model</div>
+  <div class="model-section">
+    <div style="flex:1;min-width:200px">
+      <div class="model-wrap">
+        <input class="model-input" id="modelSearch" placeholder="Search or type model ID…" autocomplete="off"/>
+        <div class="model-dropdown" id="modelDropdown"></div>
+      </div>
+      <div class="model-selected-label" id="modelSelectedLabel" style="display:none"></div>
+    </div>
+    <button class="load-models-btn" onclick="loadModels()">↻ Load models</button>
+  </div>
+
+  <!-- Agents -->
+  <div class="agents-section">
+    <div class="sec-label">Agents — select 3 to 5</div>
+    <div class="agents-grid" id="agentsGrid"></div>
+    <div class="agents-note" id="agentsNote"></div>
+  </div>
+
+  <!-- Decision -->
+  <div class="input-section">
+    <label>Decision to evaluate</label>
+    <textarea id="decisionInput" placeholder="Describe the decision you need to validate…"></textarea>
+  </div>
+  <div class="input-section">
+    <label>Context / constraints (optional)</label>
+    <textarea id="contextInput" placeholder="Background info, constraints, objectives…" style="min-height:64px"></textarea>
+  </div>
+
+  <button class="run-btn" id="runBtn" onclick="runPanel()">Run decision panel →</button>
+
+  <!-- Pipeline output -->
+  <div class="pipeline" id="pipeline" style="display:none">
+
+    <div>
+      <div class="phase-label">Phase 1 — Agent analysis</div>
+      <div id="agentOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <div>
+      <div class="phase-label">Phase 2 — Cross-critique</div>
+      <div class="block-out critique">
+        <div class="block-head">
+          <span class="block-head-label">Agents review each other's positions</span>
+          <div class="status-dot" id="critDot" style="margin-left:auto"></div>
+        </div>
+        <div class="block-body empty" id="critBody">Waiting…</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="phase-label">Phase 3 — Synthesis</div>
+      <div class="block-out synth">
+        <div class="block-head">
+          <span class="block-head-label">Final verdict</span>
+          <div class="status-dot" id="synthDot" style="margin-left:auto"></div>
+        </div>
+        <div class="block-body empty" id="synthBody">Waiting…</div>
+      </div>
+    </div>
+
+    <div>
+      <button class="reset-btn" onclick="resetPanel()">← New decision</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const AGENTS = [
+  {id:'devil', name:"Devil's Advocate", desc:"Challenges every assumption", color:'#ff5a5a',
+   system:`You are a Devil's Advocate. Challenge every assumption, find logical gaps, argue against the decision. Be adversarial but rigorous. Format: **Position** (1 sentence) then **Key challenges** (3 bullet points max).`},
+  {id:'risk',  name:"Risk Assessor",    desc:"Surfaces failure modes",      color:'#ff9f5a',
+   system:`You are a Risk Assessor. Identify failure modes, tail risks, worst-case scenarios. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max with severity).`},
+  {id:'expert',name:"Domain Expert",    desc:"Evaluates feasibility",        color:'#5ab8ff',
+   system:`You are a Domain Expert. Evaluate technical and operational feasibility. Flag knowledge gaps. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max).`},
+  {id:'optimist',name:"Optimist",       desc:"Finds upside & opportunities", color:'#e8ff5a',
+   system:`You are an Optimist. Identify best-case scenarios, undervalued opportunities, strengths. Format: **Upside potential** (1 sentence) then **Key opportunities** (3 bullet points max).`},
+  {id:'strategist',name:"Strategist",   desc:"Long-term alignment",          color:'#b85aff',
+   system:`You are a Strategist. Evaluate alignment with long-term goals and competitive positioning. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`},
+  {id:'ethicist',name:"Ethicist",       desc:"Compliance & values",          color:'#5affb8',
+   system:`You are an Ethicist/Regulator. Flag compliance issues, ethical concerns, reputational risks, stakeholder impacts. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max).`},
+];
+
+let selectedAgents = new Set(['devil','risk','expert']);
+let selectedModel  = 'anthropic/claude-sonnet-4-5';
+let allModels      = [];
+
+// ── Model search ──────────────────────────────────────────
+const modelSearchEl  = document.getElementById('modelSearch');
+const modelDropdown  = document.getElementById('modelDropdown');
+const modelLabel     = document.getElementById('modelSelectedLabel');
+modelSearchEl.value  = selectedModel;
+
+async function loadModels(){
+  modelDropdown.innerHTML = '<div class="model-status">Loading…</div>';
+  modelDropdown.classList.add('open');
+  try{
+    const r = await fetch('/api/models');
+    const d = await r.json();
+    allModels = (d.data||[])
+      .filter(m => m.id && (m.architecture?.output_modalities||[]).includes('text'))
+      .sort((a,b) => a.id.localeCompare(b.id));
+    renderDropdown(modelSearchEl.value);
+  }catch(e){
+    modelDropdown.innerHTML = `<div class="model-status" style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+modelSearchEl.addEventListener('focus', ()=>{ if(allModels.length) { renderDropdown(modelSearchEl.value); modelDropdown.classList.add('open'); } });
+modelSearchEl.addEventListener('input', ()=> renderDropdown(modelSearchEl.value));
+document.addEventListener('click', e=>{ if(!e.target.closest('.model-wrap') && !e.target.closest('.load-models-btn')) modelDropdown.classList.remove('open'); });
+
+function renderDropdown(q){
+  const q2 = q.toLowerCase();
+  const list = allModels.filter(m => m.id.toLowerCase().includes(q2)||(m.name||'').toLowerCase().includes(q2)).slice(0,50);
+  if(!list.length){ modelDropdown.innerHTML='<div class="model-status">No matches</div>'; return; }
+  modelDropdown.innerHTML = list.map(m=>{
+    const price = m.pricing?.prompt ? `$${(parseFloat(m.pricing.prompt)*1e6).toFixed(3)}/M` : '';
+    return `<div class="model-opt" onclick="selectModel('${m.id}')">
+      <span>${m.name||m.id}</span><span class="mprice">${price}</span>
+      <div class="mid">${m.id}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectModel(id){
+  selectedModel = id;
+  modelSearchEl.value = id;
+  modelLabel.textContent = '✓ selected';
+  modelLabel.style.display = 'block';
+  modelDropdown.classList.remove('open');
+}
+
+// ── Agents ────────────────────────────────────────────────
+function renderAgents(){
+  document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
+    const active  = selectedAgents.has(a.id);
+    const locked  = !active && selectedAgents.size >= 5;
+    return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
+      <div class="agent-check">${active?'✓':''}</div>
+      <div class="agent-name" style="color:${active?a.color:'var(--text)'}">${a.name}</div>
+      <div class="agent-desc">${a.desc}</div>
+    </div>`;
+  }).join('');
+  const n = selectedAgents.size;
+  document.getElementById('agentsNote').textContent =
+    n < 3 ? `Select ${3-n} more agent${3-n>1?'s':''} to continue` :
+    `${n} agent${n>1?'s':''} selected${n===5?' (maximum)':''}`;
+}
+
+function toggleAgent(id){
+  if(selectedAgents.has(id)){ if(selectedAgents.size<=3) return; selectedAgents.delete(id); }
+  else { if(selectedAgents.size>=5) return; selectedAgents.add(id); }
+  renderAgents();
+}
+
+// ── API proxy calls ───────────────────────────────────────
+async function callProxy(messages){
+  const r = await fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({model: selectedModel, max_tokens: 600, messages})
+  });
+  const d = await r.json();
+  if(d.error) throw new Error(d.error.message||'API error');
+  return d.choices[0].message.content;
+}
+
+// ── Run panel ─────────────────────────────────────────────
+async function runPanel(){
+  const decision = document.getElementById('decisionInput').value.trim();
+  if(!decision){ alert('Describe the decision to evaluate'); return; }
+  if(selectedAgents.size < 3){ alert('Select at least 3 agents'); return; }
+
+  document.getElementById('pipeline').style.display = 'flex';
+  document.getElementById('runBtn').disabled = true;
+  window.scrollBy({top:200,behavior:'smooth'});
+
+  const agents = AGENTS.filter(a => selectedAgents.has(a.id));
+  const context = document.getElementById('contextInput').value.trim();
+  const decisionBlock = `Decision: ${decision}${context?'\n\nContext: '+context:''}`;
+
+  // Build output cards
+  const outEl = document.getElementById('agentOutputs');
+  outEl.innerHTML = agents.map(a=>`
+    <div class="agent-out running" id="ao-${a.id}">
+      <div class="agent-out-head">
+        <span class="agent-badge">${a.name}</span>
+        <span class="agent-out-desc">${a.desc}</span>
+        <div class="status-dot"></div>
+      </div>
+      <div class="agent-out-body empty" id="ab-${a.id}">Analyzing…</div>
+    </div>`).join('');
+
+  // Phase 1 — parallel
+  const results = {};
+  await Promise.all(agents.map(async a=>{
+    try{
+      const res = await callProxy([
+        {role:'system', content: a.system},
+        {role:'user',   content: decisionBlock}
+      ]);
+      results[a.id] = res;
+      document.getElementById(`ab-${a.id}`).textContent = res;
+      document.getElementById(`ab-${a.id}`).classList.remove('empty');
+      document.getElementById(`ao-${a.id}`).className = 'agent-out done';
+    }catch(e){
+      results[a.id] = `Error: ${e.message}`;
+      document.getElementById(`ab-${a.id}`).textContent = results[a.id];
+      document.getElementById(`ao-${a.id}`).className = 'agent-out error';
+    }
+  }));
+
+  // Phase 2 — cross-critique
+  const critDot  = document.getElementById('critDot');
+  const critBody = document.getElementById('critBody');
+  critDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+  critBody.classList.remove('empty');
+  critBody.textContent = 'Analyzing…';
+
+  const analysesBlock = agents.map(a=>`[${a.name}]:\n${results[a.id]}`).join('\n\n---\n\n');
+
+  let critique = '';
+  try{
+    critique = await callProxy([
+      {role:'system', content:'You are a sharp, concise debate moderator. No fluff.'},
+      {role:'user',   content:`Decision: ${decision}\n\nAgent analyses:\n${analysesBlock}\n\nIdentify: 1) 2-3 strongest consensus points, 2) 2-3 sharpest disagreements, 3) blind spots none addressed. Be concise.`}
+    ]);
+    critBody.textContent = critique;
+    critDot.style.cssText = 'background:var(--accent2);animation:none';
+  }catch(e){
+    critBody.textContent = `Error: ${e.message}`;
+    critDot.style.cssText = 'background:var(--danger);animation:none';
+  }
+
+  // Phase 3 — synthesis
+  const synthDot  = document.getElementById('synthDot');
+  const synthBody = document.getElementById('synthBody');
+  synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+  synthBody.classList.remove('empty');
+  synthBody.textContent = 'Synthesizing…';
+
+  try{
+    const synth = await callProxy([
+      {role:'system', content:'You are a decisive executive. Give clear verdicts with concise reasoning.'},
+      {role:'user',   content:`Decision: ${decision}\n\nAgent analyses:\n${analysesBlock}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n2. Top 3 risks to monitor\n3. Recommended next step (1 sentence)`}
+    ]);
+
+    const firstLine = synth.split('\n')[0]||'';
+    let vclass = 'conditional';
+    if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
+    else if(/NO-GO/.test(firstLine)) vclass = 'nogo';
+
+    synthBody.classList.remove('empty');
+    synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
+      `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
+    synthDot.style.cssText = 'background:var(--accent2);animation:none';
+  }catch(e){
+    synthBody.textContent = `Error: ${e.message}`;
+    synthDot.style.cssText = 'background:var(--danger);animation:none';
+  }
+}
+
+function resetPanel(){
+  document.getElementById('pipeline').style.display = 'none';
+  document.getElementById('runBtn').disabled = false;
+  document.getElementById('agentOutputs').innerHTML = '';
+  ['critBody','synthBody'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.textContent = 'Waiting…';
+    el.className = 'block-body empty';
+  });
+  ['critDot','synthDot'].forEach(id=>{
+    document.getElementById(id).style.cssText = '';
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderAgents();
+</script>
+</body>
+</html>
