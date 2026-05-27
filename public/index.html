@@ -50,7 +50,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .surface-hover:hover{background:var(--surface-hover)}
 
 /* Header */
-.header{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.header{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border);overflow:visible}
 .header h1{font-size:32px;font-weight:700;letter-spacing:-0.5px}
 .header .tag{font-family:var(--mono);font-size:10px;background:var(--text);color:#fff;padding:2px 8px;border-radius:2px;font-weight:500;letter-spacing:.05em}
 
@@ -151,10 +151,43 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
 .agent-out.collapsed .agent-out-body{display:none}
 .agent-out.collapsed .agent-out-head{border-bottom:none}
-.hero-lede{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:28px;max-width:560px;overflow:visible;padding-bottom:4px}
+.hero-lede{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:28px;max-width:560px;overflow:visible;padding-bottom:8px}
 .model-lede{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:-14px;margin-bottom:20px;line-height:1.5}
 .brief-sublabel{font-family:var(--mono);font-size:10px;color:var(--muted);display:block;margin-top:6px}
 .bias-chip{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;margin-top:6px}
+
+/* History icon button in header */
+.hist-icon-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-left:auto;transition:all .15s;align-self:center}
+.hist-icon-btn:hover{border-color:var(--text);color:var(--text)}
+
+/* History drawer + overlay */
+.hist-overlay{position:fixed;inset:0;background:rgba(17,17,17,.35);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.hist-overlay.open{opacity:1;pointer-events:all}
+.hist-drawer{position:fixed;top:0;right:0;width:320px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg)}
+.hist-drawer.open{transform:translateX(0)}
+.hist-drawer-head{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.hist-drawer-title{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);flex:1}
+.hist-select-all-wrap{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.hist-close-btn{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px;line-height:1;margin-left:4px}
+.hist-close-btn:hover{color:var(--text)}
+.hist-list{flex:1;overflow-y:auto;padding:8px}
+.hist-empty{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-align:center;padding:32px 16px;line-height:1.7}
+.hist-entry{display:flex;align-items:flex-start;gap:8px;padding:10px;border-radius:6px;border:1px solid transparent;margin-bottom:4px;transition:all .15s}
+.hist-entry:hover{background:var(--surface-tint);border-color:var(--border)}
+.hist-entry-cb{margin-top:3px;flex-shrink:0;accent-color:var(--text);cursor:pointer}
+.hist-entry-body{flex:1;min-width:0;cursor:pointer}
+.hist-entry-date{font-family:var(--mono);font-size:9px;color:var(--muted-2);margin-bottom:3px}
+.hist-entry-decision{font-size:12px;color:var(--text-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.hist-entry-meta{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap}
+.hist-del-btn{background:none;border:none;color:var(--muted-2);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:3px;flex-shrink:0;line-height:1;align-self:center}
+.hist-del-btn:hover{color:var(--danger);background:var(--nogo-bg)}
+.hist-footer{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.hist-del-sel-btn{width:100%;background:var(--nogo-bg);border:1px solid var(--nogo-border);color:var(--nogo-text);font-family:var(--mono);font-size:11px;padding:9px;border-radius:4px;cursor:pointer;display:none}
+.hist-del-sel-btn:hover{background:#f9d7d7}
+.hist-verdict{display:inline-flex;align-items:center;padding:1px 7px;border-radius:999px;font-family:var(--mono);font-size:9px;font-weight:500}
+.hist-verdict.go{background:var(--go-bg);color:var(--go-text);border:1px solid var(--go-border)}
+.hist-verdict.nogo{background:var(--nogo-bg);color:var(--nogo-text);border:1px solid var(--nogo-border)}
+.hist-verdict.conditional{background:var(--cond-bg);color:var(--cond-text);border:1px solid var(--cond-border)}
 </style>
 </head>
 <body>
@@ -163,6 +196,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   <div class="header">
     <h1>Quorum</h1>
     <span class="tag">multi-agent decision panel</span>
+    <button class="hist-icon-btn" onclick="openDrawer()" title="Session history">&#9776; History</button>
   </div>
 
   <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
@@ -249,12 +283,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       <div id="premortOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
-    <div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="reset-btn" onclick="resetPanel()">← New decision</button>
+      <button class="reset-btn" id="exportBtn" onclick="exportSession()" style="display:none">↓ Export session</button>
     </div>
   </div>
 
 </div>
+
+<!-- History overlay + drawer -->
+<div class="hist-overlay" id="histOverlay" onclick="closeDrawer()"></div>
+<div class="hist-drawer" id="histDrawer">
+  <div class="hist-drawer-head">
+    <span class="hist-drawer-title">History</span>
+    <label class="hist-select-all-wrap"><input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this.checked)"> all</label>
+    <button class="hist-close-btn" onclick="closeDrawer()">&#xD7;</button>
+  </div>
+  <div class="hist-list" id="histList"></div>
+  <div class="hist-footer">
+    <button class="hist-del-sel-btn" id="delSelBtn" onclick="deleteSelected()">Delete selected</button>
+  </div>
+</div>
+
 <script>
 const BIAS_CHIP = {
   'contrarian':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
@@ -454,6 +504,8 @@ async function runPanel(){
   const minAgents = selectedTier === 'quick' ? 2 : 3;
   if(selectedAgents.size < minAgents){ alert(`Select at least ${minAgents} agents`); return; }
 
+  currentSession = null;
+  document.getElementById('exportBtn').style.display = 'none';
   document.getElementById('pipeline').style.display = 'flex';
   document.getElementById('runBtn').disabled = true;
   document.getElementById('phase2').style.display = selectedTier === 'quick' ? 'none' : '';
@@ -521,6 +573,10 @@ async function runPanel(){
       synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
         `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
       synthDot.style.cssText = 'background:var(--accent2);animation:none';
+      currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
+        agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[]};
+      saveSession(currentSession);
+      document.getElementById('exportBtn').style.display = '';
     }catch(e){
       synthBody.textContent = `Error: ${e.message}`;
       synthDot.style.cssText = 'background:var(--danger);animation:none';
@@ -555,11 +611,13 @@ async function runPanel(){
   synthBody.classList.remove('empty');
   synthBody.textContent = 'Synthesizing…';
 
+  let synthText = '';
   try{
     const synth = await callProxy([
       {role:'system', content: mode.synthSystem},
       {role:'user',   content: mode.synthPrompt(decision, analysesBlock, critique)}
     ]);
+    synthText = synth;
 
     const firstLine = synth.split('\n')[0]||'';
     let vclass = 'conditional';
@@ -576,6 +634,7 @@ async function runPanel(){
   }
 
   // Phase 4 — pre-mortem (parallel)
+  const pmResults = {};
   const pmEl = document.getElementById('premortOutputs');
   pmEl.innerHTML = agents.map(a=>`
     <div class="agent-out running" id="pm-${a.id}">
@@ -594,19 +653,31 @@ async function runPanel(){
         {role:'system', content: a.system},
         {role:'user',   content: `It is 12 months from now. This decision has failed.\n\n${decisionBlock}\n\nFrom your perspective (${a.name}, bias: ${a.bias}), what caused the failure? Max 3 bullet points, be specific.`}
       ]);
+      pmResults[a.id] = res;
       document.getElementById(`pb-${a.id}`).textContent = res;
       document.getElementById(`pb-${a.id}`).classList.remove('empty');
       const card = document.getElementById(`pm-${a.id}`);
       card.className = 'agent-out done collapsed';
       card.querySelector('.agent-chevron').textContent = '▶';
     }catch(e){
+      pmResults[a.id] = '';
       document.getElementById(`pb-${a.id}`).textContent = `Error: ${e.message}`;
       document.getElementById(`pm-${a.id}`).className = 'agent-out error';
     }
   }));
+
+  if(synthText){
+    currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
+      agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique,synthesis:synthText,
+      premortem:agents.map(a=>({id:a.id,name:a.name,output:pmResults[a.id]||''}))};
+    saveSession(currentSession);
+    document.getElementById('exportBtn').style.display = '';
+  }
 }
 
 function resetPanel(){
+  currentSession = null;
+  document.getElementById('exportBtn').style.display = 'none';
   document.getElementById('pipeline').style.display = 'none';
   document.getElementById('runBtn').disabled = false;
   document.getElementById('agentOutputs').innerHTML = '';
@@ -622,9 +693,226 @@ function resetPanel(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+// ── Session storage ───────────────────────────────────────
+const HISTORY_KEY = 'quorum-history';
+const HISTORY_MAX = 50;
+let currentSession = null;
+
+function saveSession(session){
+  let history = loadHistory();
+  history.unshift(session);
+  if(history.length > HISTORY_MAX) history = history.slice(0, HISTORY_MAX);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistoryDrawer();
+}
+
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }
+  catch{ return []; }
+}
+
+function extractVerdict(synthText){
+  if(!synthText) return null;
+  const first = (synthText||'').split('\n')[0];
+  if(/\bGO\b/.test(first) && !/NO-GO/.test(first)) return 'go';
+  if(/NO-GO/.test(first)) return 'nogo';
+  if(/CONDITIONAL/i.test(first)) return 'conditional';
+  return null;
+}
+
+function escHtml(str){
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── History drawer ────────────────────────────────────────
+function openDrawer(){
+  renderHistoryDrawer();
+  document.getElementById('histOverlay').classList.add('open');
+  document.getElementById('histDrawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('histOverlay').classList.remove('open');
+  document.getElementById('histDrawer').classList.remove('open');
+}
+
+function renderHistoryDrawer(){
+  const history = loadHistory();
+  const listEl = document.getElementById('histList');
+  document.getElementById('selectAllCb').checked = false;
+  document.getElementById('delSelBtn').style.display = 'none';
+
+  if(!history.length){
+    listEl.innerHTML = '<div class="hist-empty">No sessions saved yet.<br>Run Quorum to start building history.</div>';
+    return;
+  }
+
+  listEl.innerHTML = history.map(s=>{
+    const d = new Date(s.date);
+    const dateStr = d.toLocaleDateString()+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+    const verdict = extractVerdict(s.synthesis);
+    const verdictHtml = verdict ? `<span class="hist-verdict ${verdict}">${verdict==='nogo'?'NO-GO':verdict.toUpperCase()}</span>` : '';
+    const modelShort = s.model ? s.model.split('/').pop() : '';
+    const firstLine = (s.decision||'').split('\n')[0];
+    return `<div class="hist-entry" id="he-${s.id}">
+      <input type="checkbox" class="hist-entry-cb" data-id="${s.id}" onchange="updateDelSelBtn()" onclick="event.stopPropagation()">
+      <div class="hist-entry-body" onclick="restoreSession('${s.id}')" title="${escHtml(s.decision)}">
+        <div class="hist-entry-date">${escHtml(dateStr)}</div>
+        <div class="hist-entry-decision">${escHtml(firstLine)}</div>
+        <div class="hist-entry-meta">${verdictHtml}<span style="font-family:var(--mono);font-size:9px;color:var(--muted)">${escHtml(s.tier||'')} · ${escHtml(modelShort)}</span></div>
+      </div>
+      <button class="hist-del-btn" onclick="event.stopPropagation();deleteEntry('${s.id}')" title="Delete">&#xD7;</button>
+    </div>`;
+  }).join('');
+}
+
+function updateDelSelBtn(){
+  const checked = document.querySelectorAll('.hist-entry-cb:checked').length;
+  const btn = document.getElementById('delSelBtn');
+  btn.style.display = checked > 0 ? 'block' : 'none';
+  btn.textContent = `Delete selected (${checked})`;
+}
+
+function toggleSelectAll(checked){
+  document.querySelectorAll('.hist-entry-cb').forEach(cb => cb.checked = checked);
+  updateDelSelBtn();
+}
+
+function deleteEntry(id){
+  let history = loadHistory().filter(s => String(s.id) !== String(id));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistoryDrawer();
+}
+
+function deleteSelected(){
+  const ids = new Set([...document.querySelectorAll('.hist-entry-cb:checked')].map(cb=>cb.dataset.id));
+  let history = loadHistory().filter(s => !ids.has(String(s.id)));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistoryDrawer();
+}
+
+function restoreSession(id){
+  console.log('restoreSession called', id);
+  const s = loadHistory().find(h => String(h.id) === String(id));
+  if(!s) return;
+  closeDrawer();
+
+  document.getElementById('decisionInput').value = s.decision||'';
+  document.getElementById('contextInput').value = s.context||'';
+
+  selectedModel = s.model || selectedModel;
+  modelSearchEl.value = selectedModel;
+  modelLabel.style.display = 'none';
+  if(s.tier) selectedTier = s.tier;
+  if(s.judge) selectedMode = s.judge;
+  if(s.agents && s.agents.length){
+    const agentIds = s.agents.map(a=>a.id).filter(Boolean);
+    if(agentIds.length) selectedAgents = new Set(agentIds);
+  }
+  renderModes(); renderTiers(); renderAgents();
+
+  resetPanel();
+  document.getElementById('pipeline').style.display = 'flex';
+  document.getElementById('runBtn').disabled = false;
+  document.getElementById('phase2').style.display = (selectedTier==='quick'||!s.critique) ? 'none' : '';
+  document.getElementById('phase4').style.display = (selectedTier==='quick'||!s.premortem||!s.premortem.length) ? 'none' : '';
+
+  const outEl = document.getElementById('agentOutputs');
+  outEl.innerHTML = (s.agents||[]).map((a,i)=>{
+    const uid = a.id||'agent-'+i;
+    return `<div class="agent-out done collapsed" id="ao-r-${uid}">
+      <div class="agent-out-head" onclick="toggleCard('ao-r-${uid}')">
+        <span class="agent-badge">${escHtml(a.name)}</span>
+        <span class="agent-out-desc"></span>
+        <span class="agent-chevron">&#9654;</span>
+        <div class="status-dot"></div>
+      </div>
+      <div class="agent-out-body"></div>
+    </div>`;
+  }).join('');
+  (s.agents||[]).forEach((a,i)=>{
+    const uid = a.id||'agent-'+i;
+    document.querySelector(`#ao-r-${uid} .agent-out-body`).textContent = a.output||'';
+  });
+
+  if(s.critique){
+    const critBody = document.getElementById('critBody');
+    critBody.textContent = s.critique;
+    critBody.classList.remove('empty');
+    document.getElementById('critDot').style.cssText = 'background:var(--accent2);animation:none';
+  }
+
+  if(s.synthesis){
+    const synthBody = document.getElementById('synthBody');
+    const firstLine = s.synthesis.split('\n')[0]||'';
+    let vclass = 'conditional';
+    if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
+    else if(/NO-GO/.test(firstLine)) vclass = 'nogo';
+    synthBody.classList.remove('empty');
+    synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>`+
+      `<div style="white-space:pre-wrap">${s.synthesis.split('\n').slice(1).join('\n').trim()}</div>`;
+    document.getElementById('synthDot').style.cssText = 'background:var(--accent2);animation:none';
+  }
+
+  if(s.premortem && s.premortem.length){
+    document.getElementById('phase4').style.display = '';
+    const pmEl = document.getElementById('premortOutputs');
+    pmEl.innerHTML = s.premortem.map((a,i)=>{
+      const uid = a.id||'agent-'+i;
+      return `<div class="agent-out done collapsed" id="pm-r-${uid}">
+        <div class="agent-out-head" onclick="toggleCard('pm-r-${uid}')">
+          <span class="agent-badge">${escHtml(a.name)}</span>
+          <span class="agent-out-desc"></span>
+          <span class="agent-chevron">&#9654;</span>
+          <div class="status-dot"></div>
+        </div>
+        <div class="agent-out-body"></div>
+      </div>`;
+    }).join('');
+    s.premortem.forEach((a,i)=>{
+      const uid = a.id||'agent-'+i;
+      document.querySelector(`#pm-r-${uid} .agent-out-body`).textContent = a.output||'';
+    });
+  }
+
+  currentSession = s;
+  document.getElementById('exportBtn').style.display = '';
+  document.getElementById('pipeline').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── Export session ────────────────────────────────────────
+function exportSession(){
+  const s = currentSession;
+  if(!s) return;
+  const d = new Date(s.date);
+  const lines = [
+    `# Quorum Session — ${d.toLocaleString()}`,
+    '',
+    `**Decision:** ${s.decision}`,
+    '',
+  ];
+  if(s.context) lines.push(`**Context:** ${s.context}`, '');
+  lines.push(`**Model:** ${s.model}`, `**Tier:** ${s.tier}`, `**Judge:** ${s.judge}`, '', '---', '', '## Phase 1 — Agent Analysis', '');
+  (s.agents||[]).forEach(a=>{ lines.push(`### ${a.name}`, '', a.output||'', ''); });
+  if(s.critique) lines.push('---', '', '## Phase 2 — Cross-Critique', '', s.critique, '');
+  if(s.synthesis) lines.push('---', '', '## Phase 3 — Synthesis', '', s.synthesis, '');
+  if(s.premortem && s.premortem.length){
+    lines.push('---', '', '## Phase 4 — Pre-mortem', '');
+    s.premortem.forEach(a=>{ lines.push(`### ${a.name}`, '', a.output||'', ''); });
+  }
+  const blob = new Blob([lines.join('\n')], {type:'text/markdown'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `quorum-${d.toISOString().slice(0,10)}.md`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 renderModes();
 renderTiers();
 renderAgents();
+renderHistoryDrawer();
 </script>
 </body>
 </html>
