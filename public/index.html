@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>"/>
 <title>Quorum</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -40,7 +41,7 @@
 }
 html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
 
-.app{max-width:860px;margin:0 auto;padding:32px 20px 80px}
+.app{max-width:1080px;margin:0 auto;padding:32px 48px 80px 48px}
 
 /* Utility */
 .shadow-sm{box-shadow:var(--shadow-sm)}
@@ -83,10 +84,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-card.active{border-color:var(--text);background:var(--surface-tint);box-shadow:0 0 0 1px var(--text)}
 .agent-card.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
 .agent-name{font-size:12px;font-weight:600;margin-bottom:3px}
-.agent-desc{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.4}
+.agent-desc{font-family:system-ui,sans-serif;font-size:11px;color:var(--muted);line-height:1.4}
+#modeGrid .agent-desc,#tierGrid .agent-desc{font-size:13px;font-family:system-ui,sans-serif}
 .agent-check{position:absolute;top:9px;right:9px;width:14px;height:14px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
 .agent-card.active .agent-check{background:var(--text);border-color:var(--text);color:#fff}
-.agents-note{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px}
+.agents-note{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px}
 
 /* Inputs */
 .input-section{margin-bottom:20px}
@@ -102,7 +104,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 /* Pipeline */
 .pipeline{display:flex;flex-direction:column;gap:20px}
-.phase-label{font-family:var(--mono);font-size:10px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.phase-label{font-family:var(--mono);font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:10px}
 .phase-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* Agent outputs */
@@ -115,7 +117,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out.running .agent-badge{background:#111;color:#fff}
 .agent-out.done .agent-badge{background:var(--go-bg);color:var(--go-text)}
 .agent-out.error .agent-badge{background:var(--nogo-bg);color:var(--nogo-text)}
-.agent-out-desc{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.agent-out-desc{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--border);margin-left:auto;transition:background .3s}
 .agent-out.running .status-dot{background:#111;animation:pulse 1s infinite}
 .agent-out.done .status-dot{background:var(--go-text);animation:none}
@@ -151,8 +153,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
 .agent-out.collapsed .agent-out-body{display:none}
 .agent-out.collapsed .agent-out-head{border-bottom:none}
-.hero-lede{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:28px;max-width:560px;overflow:visible;padding-bottom:8px;font-family:system-ui,sans-serif}
-.model-lede{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:-14px;margin-bottom:20px;line-height:1.5}
+.hero-lede{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:28px;max-width:100%;white-space:nowrap;overflow:visible;padding-bottom:8px;font-family:system-ui,sans-serif}
+.model-lede{font-family:system-ui,sans-serif;font-size:12px;color:var(--muted);margin-top:-14px;margin-bottom:20px;line-height:1.5}
 .brief-sublabel{font-family:var(--mono);font-size:10px;color:var(--muted);display:block;margin-top:6px}
 .bias-chip{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;margin-top:6px}
 
@@ -188,6 +190,27 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .hist-verdict.go{background:var(--go-bg);color:var(--go-text);border:1px solid var(--go-border)}
 .hist-verdict.nogo{background:var(--nogo-bg);color:var(--nogo-text);border:1px solid var(--nogo-border)}
 .hist-verdict.conditional{background:var(--cond-bg);color:var(--cond-text);border:1px solid var(--cond-border)}
+
+/* Generic drawer */
+.drawer-overlay{position:fixed;inset:0;background:rgba(17,17,17,.35);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;top:0;right:0;width:320px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg)}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.drawer-title{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);flex:1}
+.drawer-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px;line-height:1;margin-left:4px}
+.drawer-close:hover{color:var(--text)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px}
+
+/* Settings button + rows */
+.settings-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .15s;align-self:center;display:inline-flex;align-items:center;gap:5px}
+.settings-btn:hover{border-color:var(--text);color:var(--text)}
+.settings-section{margin-bottom:24px}
+.settings-section-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:10px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:13px;color:var(--text)}
+.settings-row-value.placeholder{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
 </style>
 </head>
 <body>
@@ -196,7 +219,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   <div class="header">
     <h1>Quorum</h1>
     <span class="tag">multi-agent decision panel</span>
-    <button class="hist-icon-btn" onclick="openDrawer()" title="Session history">&#9776; History</button>
+    <button class="settings-btn" onclick="openSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+    <button class="hist-icon-btn" onclick="openDrawer()" title="Session history"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History</button>
   </div>
 
   <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
@@ -302,6 +326,54 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   <div class="hist-list" id="histList"></div>
   <div class="hist-footer">
     <button class="hist-del-sel-btn" id="delSelBtn" onclick="deleteSelected()">Delete selected</button>
+  </div>
+</div>
+
+<!-- Settings overlay + drawer -->
+<div class="drawer-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="drawer" id="settingsDrawer">
+  <div class="drawer-header">
+    <span class="drawer-title">Settings</span>
+    <button class="drawer-close" onclick="closeSettings()">×</button>
+  </div>
+  <div class="drawer-body">
+
+    <div class="settings-section">
+      <div class="settings-section-label">Preferences</div>
+      <div class="settings-row">
+        <span class="settings-row-label">Language</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">Model favourites</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Agents</div>
+      <div class="settings-row">
+        <span class="settings-row-label">Custom agent</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">Agent tag colour</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label">Data</div>
+      <div class="settings-row">
+        <span class="settings-row-label">Export history</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">Clear all history</span>
+        <span class="settings-row-value placeholder">Coming soon</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -908,6 +980,9 @@ function exportSession(){
   link.click();
   URL.revokeObjectURL(url);
 }
+
+function openSettings(){ document.getElementById('settingsDrawer').classList.add('open'); document.getElementById('settingsOverlay').classList.add('open'); }
+function closeSettings(){ document.getElementById('settingsDrawer').classList.remove('open'); document.getElementById('settingsOverlay').classList.remove('open'); }
 
 renderModes();
 renderTiers();

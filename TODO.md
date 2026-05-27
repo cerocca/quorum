@@ -4,21 +4,22 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 
 ---
 
-## v0.5 — Engagement tier + Storico
+## v0.5 — Lingua, preferiti, agente custom
 
-- [x] **Engagement tier**: toggle Quick (3 agenti, no cross-critique) vs Full (5 agenti, tutte le fasi)
+- [x] **Engagement tier**: Quick (2-3 agenti, fase 1+3) vs Full (3-5 agenti, tutte le fasi)
 - [x] Export singola sessione in testo/markdown — done in v2.2
 - [x] Storico sessioni: salvataggio locale (localStorage) di decisioni precedenti con risposta completa
 - [x] Visualizzazione storico nella UI (lista compatta, click per riaprire)
 - [x] Funzione cancella: singola voce o svuota tutto
+- [x] Settings drawer scaffold (Preferences, Agents, Data) con placeholder "Coming soon"
 - [ ] Selettore lingua ITA/ENG — traduzione UI e prompt degli agenti
+- [ ] Model preferiti: stella sul dropdown, salvataggio localStorage, sezione preferiti in cima alla lista
+- [ ] Agente custom: form in Settings > Agents — nome, bias, colore, system prompt. Appare come settima card selezionabile.
 
 ---
 
 ## Backlog / idee non schedulate
 
-- [ ] Agente custom: nome, bias e system prompt definibili dall'utente
-- [ ] Colore tag agente: configurabile per agente, gestito insieme all'agente custom
 - [ ] Confronto tra due decisioni in parallelo
 - [ ] Modalità "Devil's Panel" — tutti gli agenti con bias skeptic
 - [ ] Integrazione webhook (es. notifica Telegram al termine)
