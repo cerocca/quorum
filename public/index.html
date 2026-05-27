@@ -9,107 +9,139 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;
-  --accent:#e8ff5a;--accent2:#5affb8;--danger:#ff5a5a;
-  --text:#f0f0f0;--muted:#555;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
+  --bg:#f8f8f6;
+  --surface:#ffffff;
+  --surface-tint:#f3f3f0;
+  --surface-hover:#fafaf8;
+  --text:#111111;
+  --text-soft:#3a3a3a;
+  --muted:#888888;
+  --muted-2:#b8b8b6;
+  --border:#e5e5e5;
+  --border-soft:#ececea;
+  --accent:#e8ff5a;
+  --accent2:#5affb8;
+  --danger:#ff5a5a;
+  --go-bg:#e8fbef;    --go-text:#0f6b3a;   --go-border:#bce8cc;
+  --nogo-bg:#fdecec;  --nogo-text:#a51d1d; --nogo-border:#f3c2c2;
+  --cond-bg:#fff7d6;  --cond-text:#7a5a00; --cond-border:#f0d97a;
+  --phase-1:#f4f6f3;
+  --phase-2:#f1f3f7;
+  --phase-3:#f1f7f4;
+  --phase-4:#f7f4f1;
+  --chip-skeptic-bg:#fde6e6;       --chip-skeptic-tx:#a51d1d;
+  --chip-advocate-bg:#f3f9c8;      --chip-advocate-tx:#5a6a00;
+  --chip-investigative-bg:#e2efff; --chip-investigative-tx:#1e4b85;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Syne',sans-serif;
+  --shadow-sm:0 1px 2px rgba(17,17,17,.04), 0 0 0 1px rgba(17,17,17,.04);
+  --shadow-md:0 1px 2px rgba(17,17,17,.04), 0 4px 12px -2px rgba(17,17,17,.06), 0 0 0 1px rgba(17,17,17,.04);
+  --shadow-lg:0 1px 2px rgba(17,17,17,.04), 0 12px 32px -8px rgba(17,17,17,.10), 0 0 0 1px rgba(17,17,17,.05);
 }
 html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
 
 .app{max-width:860px;margin:0 auto;padding:32px 20px 80px}
 
+/* Utility */
+.shadow-sm{box-shadow:var(--shadow-sm)}
+.shadow-md{box-shadow:var(--shadow-md)}
+.shadow-lg{box-shadow:var(--shadow-lg)}
+.surface-tint{background:var(--surface-tint)}
+.surface-hover:hover{background:var(--surface-hover)}
+
 /* Header */
 .header{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border)}
 .header h1{font-size:22px;font-weight:700;letter-spacing:-0.5px}
-.header .tag{font-family:var(--mono);font-size:10px;background:var(--accent);color:#000;padding:2px 8px;border-radius:2px;font-weight:500;letter-spacing:.05em}
+.header .tag{font-family:var(--mono);font-size:10px;background:var(--text);color:#fff;padding:2px 8px;border-radius:2px;font-weight:500;letter-spacing:.05em}
 
 /* Section label */
 .sec-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 
 /* Model selector */
-.model-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.model-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
 .model-wrap{flex:1;min-width:200px;position:relative}
-.model-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:4px;outline:none;transition:border .15s}
-.model-input:focus{border-color:var(--accent)}
-.model-input::placeholder{color:#444}
-.model-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a1a1a;border:1px solid var(--border);border-radius:6px;max-height:240px;overflow-y:auto;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.model-input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:4px;outline:none;transition:border .15s}
+.model-input:focus{border-color:var(--text)}
+.model-input::placeholder{color:var(--muted-2)}
+.model-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;max-height:240px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)}
 .model-dropdown.open{display:block}
-.model-opt{padding:9px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;border-bottom:1px solid #1e1e1e;transition:background .1s}
-.model-opt:hover{background:#222}
-.model-opt .mid{color:var(--accent);font-size:10px;margin-top:2px}
+.model-opt{padding:9px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;border-bottom:1px solid var(--border-soft);transition:background .1s}
+.model-opt:hover{background:var(--surface-tint)}
+.model-opt .mid{color:var(--text-soft);font-size:10px;margin-top:2px}
 .model-opt .mprice{color:var(--muted);font-size:10px;float:right}
 .model-opt:last-child{border:none}
 .model-status{font-family:var(--mono);font-size:11px;color:var(--muted);padding:12px}
-.model-selected-label{font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:5px}
-.load-models-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:9px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;align-self:flex-start;margin-top:18px}
-.load-models-btn:hover{border-color:var(--accent);color:var(--accent)}
+.model-selected-label{font-family:var(--mono);font-size:10px;color:var(--text-soft);margin-top:5px}
+.load-models-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:11px;padding:9px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;align-self:flex-start;margin-top:18px}
+.load-models-btn:hover{border-color:var(--text);color:var(--text)}
 
 /* Agents */
 .agents-section{margin-bottom:20px}
 .agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 @media(max-width:520px){.agents-grid{grid-template-columns:repeat(2,1fr)}}
-.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px 13px;cursor:pointer;transition:all .15s;user-select:none;position:relative}
-.agent-card.active{border-color:var(--accent);background:#171a00}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px 13px;cursor:pointer;transition:all .15s;user-select:none;position:relative;box-shadow:var(--shadow-sm)}
+.agent-card.active{border-color:var(--text);background:var(--surface-tint);box-shadow:0 0 0 1px var(--text)}
 .agent-card.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
 .agent-name{font-size:12px;font-weight:600;margin-bottom:3px}
 .agent-desc{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.4}
 .agent-check{position:absolute;top:9px;right:9px;width:14px;height:14px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
-.agent-card.active .agent-check{background:var(--accent);border-color:var(--accent);color:#000}
+.agent-card.active .agent-check{background:var(--text);border-color:var(--text);color:#fff}
 .agents-note{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px}
 
 /* Inputs */
 .input-section{margin-bottom:20px}
 .input-section label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px}
-.input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55}
-.input-section textarea:focus{border-color:var(--accent)}
-.input-section textarea::placeholder{color:#3a3a3a}
+.input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55;box-shadow:var(--shadow-sm)}
+.input-section textarea:focus{border-color:var(--text)}
+.input-section textarea::placeholder{color:var(--muted-2)}
 
 /* Run */
-.run-btn{width:100%;background:var(--accent);color:#000;border:none;font-family:var(--sans);font-size:14px;font-weight:700;padding:15px;border-radius:6px;cursor:pointer;letter-spacing:.03em;transition:all .15s;margin-bottom:28px}
-.run-btn:hover:not(:disabled){background:#d4e84f;transform:translateY(-1px)}
-.run-btn:disabled{background:#252525;color:#444;cursor:not-allowed;transform:none}
+.run-btn{width:100%;background:var(--text);color:#fff;border:none;font-family:var(--sans);font-size:14px;font-weight:700;padding:15px;border-radius:6px;cursor:pointer;letter-spacing:.03em;transition:all .15s;margin-bottom:28px}
+.run-btn:hover:not(:disabled){background:#333;transform:translateY(-1px)}
+.run-btn:disabled{background:#e5e5e3;color:var(--muted-2);cursor:not-allowed;transform:none}
 
 /* Pipeline */
 .pipeline{display:flex;flex-direction:column;gap:20px}
-.phase-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.phase-label{font-family:var(--mono);font-size:10px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:10px}
 .phase-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* Agent outputs */
-.agent-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s}
-.agent-out.running{border-color:var(--accent)}
-.agent-out.done{border-color:#223318}
+.agent-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s;box-shadow:var(--shadow-sm)}
+.agent-out.running{border-color:#111}
+.agent-out.done{border-color:var(--go-border)}
 .agent-out.error{border-color:var(--danger)}
-.agent-out-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
-.agent-badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:2px;background:#222;color:var(--muted);transition:all .3s}
-.agent-out.running .agent-badge{background:var(--accent);color:#000}
-.agent-out.done .agent-badge{background:#1e3310;color:var(--accent2)}
-.agent-out.error .agent-badge{background:#3a1010;color:var(--danger)}
+.agent-out-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-tint)}
+.agent-badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:2px;background:var(--surface-tint);color:var(--text-soft);transition:all .3s}
+.agent-out.running .agent-badge{background:#111;color:#fff}
+.agent-out.done .agent-badge{background:var(--go-bg);color:var(--go-text)}
+.agent-out.error .agent-badge{background:var(--nogo-bg);color:var(--nogo-text)}
 .agent-out-desc{font-family:var(--mono);font-size:10px;color:var(--muted)}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--border);margin-left:auto;transition:background .3s}
-.agent-out.running .status-dot{background:var(--accent);animation:pulse 1s infinite}
-.agent-out.done .status-dot{background:var(--accent2);animation:none}
+.agent-out.running .status-dot{background:#111;animation:pulse 1s infinite}
+.agent-out.done .status-dot{background:var(--go-text);animation:none}
 .agent-out.error .status-dot{background:var(--danger);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.agent-out-body{padding:14px 16px;font-size:13px;line-height:1.65;color:#ccc;min-height:44px;white-space:pre-wrap}
-.agent-out-body.empty{color:#333;font-family:var(--mono);font-size:11px}
+.agent-out-body{padding:14px 16px;font-size:13px;line-height:1.65;color:var(--text-soft);min-height:44px;white-space:pre-wrap}
+.agent-out-body.empty{color:var(--muted-2);font-family:var(--mono);font-size:11px}
 
 /* Critique + Synth */
-.block-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-.block-out.critique{border-color:#1a2535}
-.block-out.synth{border-color:#1a3525}
-.block-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
-.block-head-label{font-family:var(--mono);font-size:11px;font-weight:500}
-.critique .block-head-label{color:#5ab0ff}
-.synth .block-head-label{color:var(--accent2)}
-.block-body{padding:16px;font-size:13px;line-height:1.7;color:#ccc;white-space:pre-wrap}
-.block-body.empty{color:#333;font-family:var(--mono);font-size:11px}
+.block-out{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.block-out.critique{border-color:var(--phase-2)}
+.block-out.synth{border-color:var(--phase-3)}
+.block-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-tint)}
+.block-head-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text-soft)}
+.critique .block-head-label{color:var(--chip-investigative-tx)}
+.synth .block-head-label{color:var(--go-text)}
+.block-body{padding:16px;font-size:13px;line-height:1.7;color:var(--text-soft);white-space:pre-wrap}
+.block-body.empty{color:var(--muted-2);font-family:var(--mono);font-size:11px}
 
 /* Verdict */
 .verdict-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-family:var(--mono);font-size:12px;font-weight:500;margin-bottom:14px}
-.verdict-pill.go{background:#1a3310;color:var(--accent2);border:1px solid #2a5525}
-.verdict-pill.nogo{background:#3a1010;color:var(--danger);border:1px solid #5a2525}
-.verdict-pill.conditional{background:#2a2010;color:#ffcc5a;border:1px solid #4a3820}
+.verdict-pill.go{background:var(--go-bg);color:var(--go-text);border:1px solid var(--go-border)}
+.verdict-pill.nogo{background:var(--nogo-bg);color:var(--nogo-text);border:1px solid var(--nogo-border)}
+.verdict-pill.conditional{background:var(--cond-bg);color:var(--cond-text);border:1px solid var(--cond-border)}
 
-.reset-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s}
+.reset-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s}
 .reset-btn:hover{border-color:var(--text);color:var(--text)}
 
 /* Collapsible cards */
@@ -119,6 +151,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
 .agent-out.collapsed .agent-out-body{display:none}
 .agent-out.collapsed .agent-out-head{border-bottom:none}
+.hero-lede{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:28px;max-width:560px}
+.model-lede{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:-14px;margin-bottom:20px;line-height:1.5}
+.brief-sublabel{font-family:var(--mono);font-size:10px;color:var(--muted);display:block;margin-top:6px}
 </style>
 </head>
 <body>
@@ -128,6 +163,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     <h1>Quorum</h1>
     <span class="tag">multi-agent decision panel</span>
   </div>
+
+  <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong. Describe the call. Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
 
   <!-- Model selector -->
   <div class="sec-label">Model</div>
@@ -141,6 +178,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     </div>
     <button class="load-models-btn" onclick="loadModels()">↻ Load models</button>
   </div>
+
+  <p class="model-lede">A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.</p>
 
   <!-- Judge mode -->
   <div class="agents-section">
@@ -163,8 +202,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
   <!-- Decision -->
   <div class="input-section">
-    <label>Decision to evaluate</label>
+    <label>The decision</label>
     <textarea id="decisionInput" placeholder="Describe the decision you need to validate…"></textarea>
+    <span class="brief-sublabel">Be specific — vague calls beget vague rulings.</span>
   </div>
   <div class="input-section">
     <label>Context / constraints (optional)</label>
@@ -218,24 +258,24 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 const BIAS_COLOR = { skeptic:'#ff5a5a', advocate:'#e8ff5a', investigative:'#5ab8ff' };
 
 const AGENTS = [
-  {id:'devil', name:"Devil's Advocate", desc:"Challenges every assumption", bias:'skeptic', color:'#ff5a5a',
+  {id:'devil', name:"Devil's Advocate", desc:"Hunts for hidden flaws and motivated reasoning. Inverts every claim before accepting it.", bias:'contrarian', color:'#ff5a5a',
    system:`You are a Devil's Advocate with a skeptic bias. Your role is adversarial: dismantle every assumption, expose logical gaps, argue against the decision as if your job is to kill it. Do not soften your critique. Format: **Position** (1 sentence against) then **Key challenges** (3 bullet points max, each targeting a specific assumption).`},
-  {id:'risk',  name:"Risk Assessor",    desc:"Surfaces failure modes",      bias:'investigative', color:'#ff9f5a',
+  {id:'risk',  name:"Risk Assessor",    desc:"Maps failure modes and tail risks. Names who pays the cost if this goes wrong.", bias:'risk-first', color:'#ff9f5a',
    system:`You are a Risk Assessor with an investigative bias. Seek out failure modes aggressively. Treat absence of evidence as suspicious, not reassuring. Assume things will go wrong unless proven otherwise. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max, each with severity and specific failure path).`},
-  {id:'expert',name:"Domain Expert",    desc:"Evaluates feasibility",        bias:'investigative', color:'#5ab8ff',
+  {id:'expert',name:"Domain Expert",    desc:"Weighs feasibility against effort. Refuses anything without a clean execution plan.", bias:'feasibility', color:'#5ab8ff',
    system:`You are a Domain Expert with an investigative bias. Evaluate technical and operational feasibility by probing every gap. Flag missing information, unproven assumptions, and hidden complexity. Do not give the benefit of the doubt. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max, prioritize gaps and unknowns).`},
-  {id:'optimist',name:"Optimist",       desc:"Finds upside & opportunities", bias:'advocate', color:'#e8ff5a',
+  {id:'optimist',name:"Optimist",       desc:"Maps the upside path. Assumes systems compound. Anchors on the largest plausible win.", bias:'opportunity', color:'#e8ff5a',
    system:`You are an Optimist with an advocate bias. Defend the decision. Find the undervalued upside, the overlooked opportunity, the asymmetric gain. Make the strongest possible case for moving forward. Format: **Upside potential** (1 sentence, make it compelling) then **Key opportunities** (3 bullet points max, be specific about value).`},
-  {id:'strategist',name:"Strategist",   desc:"Long-term alignment",          bias:'advocate', color:'#b85aff',
+  {id:'strategist',name:"Strategist",   desc:"Projects three moves ahead. Discounts the present in favor of second-order effects.", bias:'horizon', color:'#b85aff',
    system:`You are a Strategist with an advocate bias. Argue for strategic alignment when defensible. Frame the decision in terms of long-term positioning and competitive advantage. If alignment is weak, say so briefly, but spend most effort on making the strongest strategic case. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`},
-  {id:'ethicist',name:"Ethicist",       desc:"Compliance & values",          bias:'skeptic', color:'#5affb8',
+  {id:'ethicist',name:"Ethicist",       desc:"Names who pays the cost and whether they consented to pay it. Flags the harm surface.", bias:'harm-aware', color:'#5affb8',
    system:`You are an Ethicist/Regulator with a skeptic bias. Assume hidden risks until proven otherwise. Probe for compliance issues, ethical blind spots, reputational exposure, and stakeholder harm. Default to concern. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max, name specific stakeholders or regulations at risk).`},
 ];
 
 const JUDGE_MODES = {
   analyst: {
     label: 'Analyst',
-    desc: 'Balanced — weighs all inputs equally',
+    desc: 'Calm. Synthesizing. Weighs trade-offs. Inclined to ship with conditions.',
     critSystem: 'You are a sharp, balanced debate moderator. Weigh all perspectives equally. No fluff.',
     critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nIdentify: 1) 2-3 strongest consensus points, 2) 2-3 sharpest disagreements, 3) blind spots none addressed. Be concise.`,
     synthSystem: 'You are a decisive, balanced executive. Weigh all inputs before giving your verdict.',
@@ -243,7 +283,7 @@ const JUDGE_MODES = {
   },
   sentinel: {
     label: 'Sentinel',
-    desc: 'Risk-first — defaults to NO-GO under uncertainty',
+    desc: 'Strict. Downside-first. Raises the bar. Inclined to defer until risk is named.',
     critSystem: 'You are a strict, risk-focused debate moderator. Prioritize downside scenarios. When in doubt, surface the risk. No fluff.',
     critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nFocus on: 1) 2-3 most critical risks raised, 2) disagreements where the pessimistic view may be correct, 3) red flags that optimistic agents may have downplayed. Be concise.`,
     synthSystem: 'You are a risk-first executive. Your default is NO-GO unless evidence strongly supports proceeding. Uncertainty is not a reason to proceed.',
