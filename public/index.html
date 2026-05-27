@@ -30,7 +30,7 @@
   --phase-3:#f1f7f4;
   --phase-4:#f7f4f1;
   --chip-skeptic-bg:#fde6e6;       --chip-skeptic-tx:#a51d1d;
-  --chip-advocate-bg:#f3f9c8;      --chip-advocate-tx:#5a6a00;
+  --chip-advocate-bg:#e8e8ff;      --chip-advocate-tx:#3a3a9a;
   --chip-investigative-bg:#e2efff; --chip-investigative-tx:#1e4b85;
   --mono:'IBM Plex Mono',monospace;
   --sans:'Syne',sans-serif;
@@ -51,11 +51,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 /* Header */
 .header{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;padding-bottom:18px;border-bottom:1px solid var(--border)}
-.header h1{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.header h1{font-size:32px;font-weight:700;letter-spacing:-0.5px}
 .header .tag{font-family:var(--mono);font-size:10px;background:var(--text);color:#fff;padding:2px 8px;border-radius:2px;font-weight:500;letter-spacing:.05em}
 
 /* Section label */
-.sec-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600}
 
 /* Model selector */
 .model-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
@@ -90,7 +90,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 /* Inputs */
 .input-section{margin-bottom:20px}
-.input-section label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px}
+.input-section label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px;font-weight:600}
 .input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55;box-shadow:var(--shadow-sm)}
 .input-section textarea:focus{border-color:var(--text)}
 .input-section textarea::placeholder{color:var(--muted-2)}
@@ -151,9 +151,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
 .agent-out.collapsed .agent-out-body{display:none}
 .agent-out.collapsed .agent-out-head{border-bottom:none}
-.hero-lede{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:28px;max-width:560px}
+.hero-lede{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:28px;max-width:560px;overflow:visible;padding-bottom:4px}
 .model-lede{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:-14px;margin-bottom:20px;line-height:1.5}
 .brief-sublabel{font-family:var(--mono);font-size:10px;color:var(--muted);display:block;margin-top:6px}
+.bias-chip{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;margin-top:6px}
 </style>
 </head>
 <body>
@@ -164,7 +165,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     <span class="tag">multi-agent decision panel</span>
   </div>
 
-  <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong. Describe the call. Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
+  <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
 
   <!-- Model selector -->
   <div class="sec-label">Model</div>
@@ -255,7 +256,14 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 </div>
 <script>
-const BIAS_COLOR = { skeptic:'#ff5a5a', advocate:'#e8ff5a', investigative:'#5ab8ff' };
+const BIAS_CHIP = {
+  'contrarian':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
+  'risk-first':  {bg:'var(--chip-investigative-bg)', tx:'var(--chip-investigative-tx)'},
+  'feasibility': {bg:'var(--chip-investigative-bg)', tx:'var(--chip-investigative-tx)'},
+  'opportunity': {bg:'var(--chip-advocate-bg)',      tx:'var(--chip-advocate-tx)'},
+  'horizon':     {bg:'var(--chip-advocate-bg)',      tx:'var(--chip-advocate-tx)'},
+  'harm-aware':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
+};
 
 const AGENTS = [
   {id:'devil', name:"Devil's Advocate", desc:"Hunts for hidden flaws and motivated reasoning. Inverts every claim before accepting it.", bias:'contrarian', color:'#ff5a5a',
@@ -292,8 +300,8 @@ const JUDGE_MODES = {
 };
 
 const TIERS = {
-  full:  { label: 'Full',  desc: 'All phases — analysis, critique, synthesis, pre-mortem' },
-  quick: { label: 'Quick', desc: '3 agents — Phase 1 & 3 only, no critique or pre-mortem' },
+  full:  { label: 'Full',  desc: 'All phases · 3 to 5 agents · includes cross-critique and pre-mortem.' },
+  quick: { label: 'Quick', desc: 'Phase 1 + 3 only · 2 to 3 agents · fast ruling without critique.' },
 };
 
 let selectedAgents = new Set(['devil','risk','expert']);
@@ -354,7 +362,7 @@ function renderModes(){
     const active = selectedMode === key;
     return `<div class="agent-card ${active?'active':''}" onclick="selectMode('${key}')">
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:${active?'var(--accent)':'var(--text)'}">${m.label}</div>
+      <div class="agent-name" style="color:var(--text)">${m.label}</div>
       <div class="agent-desc">${m.desc}</div>
     </div>`;
   }).join('');
@@ -371,7 +379,7 @@ function renderTiers(){
     const active = selectedTier === key;
     return `<div class="agent-card ${active?'active':''}" onclick="selectTier('${key}')">
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:${active?'var(--accent)':'var(--text)'}">${t.label}</div>
+      <div class="agent-name" style="color:var(--text)">${t.label}</div>
       <div class="agent-desc">${t.desc}</div>
     </div>`;
   }).join('');
@@ -393,26 +401,28 @@ function renderAgents(){
   document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
     const active  = selectedAgents.has(a.id);
     const locked  = !active && selectedAgents.size >= maxAgents;
-    const bc      = BIAS_COLOR[a.bias];
+    const chip    = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
     return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:${active?a.color:'var(--text)'}">${a.name}</div>
+      <div class="agent-name" style="color:var(--text)">${a.name}</div>
       <div class="agent-desc">${a.desc}</div>
-      <div style="margin-top:5px;display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:1px 6px;border-radius:2px;background:${bc};color:#000">${a.bias}</div>
+      <span class="bias-chip" style="background:${chip.bg};color:${chip.tx}">${a.bias}</span>
     </div>`;
   }).join('');
   document.getElementById('agentsSectionLabel').textContent =
-    selectedTier === 'quick' ? 'Agents — exactly 3' : 'Agents — select 3 to 5';
+    selectedTier === 'quick' ? 'Agents — select 2 to 3' : 'Agents — select 3 to 5';
   const n = selectedAgents.size;
+  const minAgents = selectedTier === 'quick' ? 2 : 3;
   document.getElementById('agentsNote').textContent =
-    n < 3 ? `Select ${3-n} more agent${3-n>1?'s':''} to continue` :
+    n < minAgents ? `Select ${minAgents-n} more agent${minAgents-n>1?'s':''} to continue` :
     selectedTier === 'quick' ? `${n} agents selected (Quick mode)` :
     `${n} agent${n>1?'s':''} selected${n===5?' (maximum)':''}`;
 }
 
 function toggleAgent(id){
   const maxAgents = selectedTier === 'quick' ? 3 : 5;
-  if(selectedAgents.has(id)){ if(selectedAgents.size<=3) return; selectedAgents.delete(id); }
+  const minAgents = selectedTier === 'quick' ? 2 : 3;
+  if(selectedAgents.has(id)){ if(selectedAgents.size<=minAgents) return; selectedAgents.delete(id); }
   else { if(selectedAgents.size>=maxAgents) return; selectedAgents.add(id); }
   renderAgents();
 }
@@ -441,7 +451,8 @@ async function callProxy(messages){
 async function runPanel(){
   const decision = document.getElementById('decisionInput').value.trim();
   if(!decision){ alert('Describe the decision to evaluate'); return; }
-  if(selectedAgents.size < 3){ alert('Select at least 3 agents'); return; }
+  const minAgents = selectedTier === 'quick' ? 2 : 3;
+  if(selectedAgents.size < minAgents){ alert(`Select at least ${minAgents} agents`); return; }
 
   document.getElementById('pipeline').style.display = 'flex';
   document.getElementById('runBtn').disabled = true;
