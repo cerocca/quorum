@@ -4,14 +4,14 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 
 ---
 
-## v3 — Engagement tier + Storico
+## v0.5 — Engagement tier + Storico
 
-- [ ] **Engagement tier**: toggle Quick (3 agenti, no cross-critique) vs Full (5 agenti, tutte le fasi)
-- [ ] Export singola sessione in testo/markdown (TBD)
+- [x] **Engagement tier**: toggle Quick (3 agenti, no cross-critique) vs Full (5 agenti, tutte le fasi)
+- [x] Export singola sessione in testo/markdown — done in v2.2
+- [x] Storico sessioni: salvataggio locale (localStorage) di decisioni precedenti con risposta completa
+- [x] Visualizzazione storico nella UI (lista compatta, click per riaprire)
+- [x] Funzione cancella: singola voce o svuota tutto
 - [ ] Selettore lingua ITA/ENG — traduzione UI e prompt degli agenti
-- [ ] Storico sessioni: salvataggio locale (localStorage) di decisioni precedenti con risposta completa
-- [ ] Visualizzazione storico nella UI (lista compatta, click per riaprire)
-- [ ] Funzione cancella: singola voce o svuota tutto
 
 ---
 

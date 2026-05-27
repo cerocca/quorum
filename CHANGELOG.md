@@ -1,39 +1,45 @@
 # CHANGELOG — Quorum Decision Panel
 
-## v2.1 — Engagement tier + Collapsible cards
+## v0.4 — Light theme, UI copy, history & export
+*2026-05-27*
+
+- Applied light theme replacing dark theme
+- Hero tagline and model lede added
+- Agent descriptions and bias labels rewritten
+- Judge card descriptions updated (Analyst / Sentinel)
+- All 6 agent bias labels made unique (contrarian, risk-first, feasibility, opportunity, horizon, harm-aware)
+- Bias badges styled as rounded pills
+- Section and input labels set to bold
+- Active card text color fixed (no yellow on text)
+- Agent names always black
+- Engagement tier: Quick 2-3 agents, Full 3-5, descriptions updated
+- Font switched to system-ui for agent output and hero lede
+- Session export: markdown download after completed run
+- History drawer: localStorage, max 50 sessions, verdict pill, single/multi delete
+- Restore session from history with scroll to pipeline
+- public/ mounted as bind volume in docker-compose.yml
+
+## v0.3 — Agent bias, Judge modes, Pre-mortem, Engagement tier
 *2026-05-26*
 
-- Added Engagement tier selector: Quick (3 agents, Phase 1+3 only) vs Full (all phases)
-- Quick mode locks agent selection to exactly 3
-- Added collapsible agent output cards with chevron indicator
-- Cards auto-collapse when done, stay expanded while running
-- Error cards stay visible by default
+- Bias property added to all 6 agents (skeptic / advocate / investigative)
+- Agent system prompts rewritten with declared bias framing
+- Bias badge on each agent card
+- Judge modes: Analyst and Sentinel
+- Judge mode selector in UI
+- Phase 4: Pre-mortem
+- Engagement tier: Quick (3 agents, phase 1+3) vs Full (all phases)
+- Collapsible agent output cards
 
-## v2 — Agent bias, Judge modes, Pre-mortem
+## v0.2 — Docker stack
 *2026-05-26*
 
-- Added bias property to all 6 agents (skeptic / advocate / investigative)
-- Rewrote all agent system prompts with declared bias framing
-- Added bias badge on each agent card (color-coded)
-- Added JUDGE_MODES: Analyst (balanced) and Sentinel (risk-first, default NO-GO)
-- Added Judge mode selector in UI
-- Added Phase 4: Pre-mortem — each agent answers what caused the failure in 12 months
-- resetPanel() updated to clear Phase 4 outputs
+- server.js: Express proxy for /api/chat and /api/models → OpenRouter
+- package.json, Dockerfile, docker-compose.yml
+- Port 3003, restart: unless-stopped
 
-## v2-infra — Docker stack
+## v0.1 — Frontend standalone
 *2026-05-26*
 
-- Added `server.js`: Express proxy for `/api/chat` and `/api/models` → OpenRouter
-  - `OR_KEY` and `DEFAULT_MODEL` loaded from `.env`
-  - `model` field passed through from client body; falls back to `DEFAULT_MODEL` if missing
-  - Error handling: rate limit (429), model not found (404), timeout (10s models / 30s chat)
-- Added `package.json` (ESM, dependency: express)
-- Added `Dockerfile` (node:20-alpine, port 3003)
-- Added `docker-compose.yml` (port 3003, env_file, restart: unless-stopped)
-
-## v1 — Frontend standalone
-*2026-05-26*
-
-- Added `public/index.html`: single-file frontend, 3-phase pipeline, model selector
-- Added `.gitignore` (node_modules, .env, .DS_Store)
-- Added `.env.example` with OR_KEY, DEFAULT_MODEL, PORT
+- public/index.html: single-file frontend, 3-phase pipeline, model selector
+- .gitignore, .env.example

@@ -81,11 +81,9 @@ Open `http://localhost:3003` (or `http://<your-server>:3003` on LAN).
 
 ## Roadmap
 
-### v3 — planned
-- Engagement tier: Quick (3 agents, no cross-critique) vs Full (5 agents, all phases)
-- Company profile: persistent context injected into every call
-- Session history with localStorage and delete function
+### v0.5 — planned
 - ITA/ENG language selector
+- Company profile: persistent context injected into every call
 
 ### Backlog
 - Custom agent: user-defined name, bias and system prompt
