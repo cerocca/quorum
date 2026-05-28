@@ -40,6 +40,8 @@ quorum/
 ├── server.js          ← proxy Express: /api/chat, /api/models → OpenRouter
 ├── Dockerfile
 ├── docker-compose.yml
+├── data/              ← volume SQLite (non committare quorum.db)
+│   └── quorum.db      ← generato a runtime, in .gitignore
 └── public/
     └── index.html     ← frontend single-file
 ```
@@ -53,6 +55,7 @@ quorum/
 | Frontend | Single-file HTML/CSS/JS in `public/` |
 | Backend | Node.js + Express (proxy OpenRouter) |
 | LLM provider | OpenRouter (unico) |
+| Database | SQLite via better-sqlite3, file `/app/data/quorum.db` |
 | Container | Docker + docker-compose |
 | Porta | 3003 (verificare conflitti su Sibilla) |
 | Restart policy | `unless-stopped` |
@@ -81,10 +84,10 @@ Solo a quel punto Claude Code deve:
 2. Aggiornare `TODO.md` — segnare completati, aggiungere nuovi emersi
 3. Aggiornare `SETUP.md` se sono cambiate istruzioni di setup/config
 4. Aggiornare `CLAUDE.md` se sono cambiate architettura o convenzioni
-5. Solo allora: `git add`, `git commit`, `git push`
+5. **Fermarsi qui.** Il commit finale (`git add`, `git commit`, `git push`) lo esegue sempre l'utente da terminale.
 
-**Commit message format**: `v{X} — descrizione breve in italiano`
-Esempio: `v1 — frontend standalone funzionante`
+**Commit message format**: `v{X.Y.Z} — descrizione breve in italiano`
+Esempio: `v0.4.5 — migrazione SQLite per history e favourites`
 
 ---
 
@@ -123,8 +126,7 @@ ss -tlnp | grep 3003
 ## Versioni
 
 Vedi `CHANGELOG.md` per la storia completa.
-Versione corrente: **nessuna** — repo non ancora inizializzato, v1 non testata né committata.
-Prossima: **v1** (test e primo commit del frontend standalone)
+Versione corrente: **v0.4.5** — migrazione SQLite per history e favourites.
 
 ---
 
