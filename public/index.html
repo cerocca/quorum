@@ -66,11 +66,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .model-input::placeholder{color:var(--muted-2)}
 .model-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;max-height:240px;overflow-y:auto;z-index:100;display:none;box-shadow:var(--shadow-md)}
 .model-dropdown.open{display:block}
-.model-opt{padding:9px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;border-bottom:1px solid var(--border-soft);transition:background .1s}
+.model-opt{padding:9px 12px;font-family:var(--mono);font-size:11px;cursor:pointer;border-bottom:1px solid var(--border-soft);transition:background .1s;display:flex;align-items:flex-start}
 .model-opt:hover{background:var(--surface-tint)}
+.model-opt-content{flex:1;min-width:0}
 .model-opt .mid{color:var(--text-soft);font-size:10px;margin-top:2px}
 .model-opt .mprice{color:var(--muted);font-size:10px;float:right}
 .model-opt:last-child{border:none}
+.model-opt-star{background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:0 6px 0 0;flex-shrink:0;line-height:1.2}
+.model-opt-star.active{color:#f5a623}
+.model-fav-label{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 4px;font-weight:600;display:block}
+.model-fav-divider{height:1px;background:var(--border);margin:2px 0}
 .model-status{font-family:var(--mono);font-size:11px;color:var(--muted);padding:12px}
 .model-selected-label{font-family:var(--mono);font-size:10px;color:var(--text-soft);margin-top:5px}
 .load-models-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:11px;padding:9px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;align-self:flex-start;margin-top:18px}
@@ -92,8 +97,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 /* Inputs */
 .input-section{margin-bottom:20px}
-.input-section label{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px;font-weight:600}
-.input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55;box-shadow:var(--shadow-sm)}
+.input-section label{font-family:system-ui,sans-serif;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px;font-weight:600}
+.input-section textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:system-ui,sans-serif;font-size:14px;padding:13px 14px;border-radius:6px;resize:vertical;min-height:90px;outline:none;transition:border .15s;line-height:1.55;box-shadow:var(--shadow-sm)}
 .input-section textarea:focus{border-color:var(--text)}
 .input-section textarea::placeholder{color:var(--muted-2)}
 
@@ -115,14 +120,19 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .agent-out-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-tint)}
 .agent-badge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:2px;background:var(--surface-tint);color:var(--text-soft);transition:all .3s}
 .agent-out.running .agent-badge{background:#111;color:#fff}
-.agent-out.done .agent-badge{background:var(--go-bg);color:var(--go-text)}
+.agent-out.done .agent-badge{background:var(--surface-tint);color:var(--text-soft)}
 .agent-out.error .agent-badge{background:var(--nogo-bg);color:var(--nogo-text)}
 .agent-out-desc{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--border);margin-left:auto;transition:background .3s}
-.agent-out.running .status-dot{background:#111;animation:pulse 1s infinite}
-.agent-out.done .status-dot{background:var(--go-text);animation:none}
-.agent-out.error .status-dot{background:var(--danger);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.status-icon{font-size:13px;margin-left:auto;display:inline-block;line-height:1;transition:color .3s}
+.agent-out .status-icon{margin-left:0;color:transparent}
+.agent-out.running .status-icon{color:var(--accent);animation:spin 1s linear infinite}
+.agent-out.running .status-icon::before{content:'⟳'}
+.agent-out.done .status-icon{color:#2a9d5c}
+.agent-out.done .status-icon::before{content:'✓'}
+.agent-out.error .status-icon{color:var(--danger)}
+.agent-out.error .status-icon::before{content:'✕'}
 .agent-out-body{padding:14px 16px;font-size:13px;line-height:1.65;color:var(--text-soft);min-height:44px;white-space:pre-wrap;font-family:system-ui,sans-serif}
 .agent-out-body.empty{color:var(--muted-2);font-family:var(--mono);font-size:11px}
 
@@ -147,7 +157,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .reset-btn:hover{border-color:var(--text);color:var(--text)}
 
 /* Collapsible cards */
-.agent-out .status-dot{margin-left:0}
 .agent-chevron{margin-left:auto;font-size:10px;color:var(--muted);user-select:none}
 .agent-out:not(.running) .agent-out-head{cursor:pointer}
 .agent-out:not(.running) .agent-out-head:hover .agent-chevron{color:var(--text)}
@@ -158,8 +167,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .brief-sublabel{font-family:var(--mono);font-size:10px;color:var(--muted);display:block;margin-top:6px}
 .bias-chip{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;margin-top:6px}
 
+/* Header button group */
+.header-actions{display:flex;gap:8px;margin-left:auto;align-items:center}
+
 /* History icon button in header */
-.hist-icon-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;margin-left:auto;transition:all .15s;align-self:center}
+.hist-icon-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .15s}
 .hist-icon-btn:hover{border-color:var(--text);color:var(--text)}
 
 /* History drawer + overlay */
@@ -224,8 +236,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   <div class="header">
     <h1>Quorum</h1>
     <span class="tag" id="headerTag">multi-agent decision panel</span>
-    <button class="settings-btn" onclick="openSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="settingsBtnText">Settings</span></button>
-    <button class="hist-icon-btn" onclick="openDrawer()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="histBtnText">History</span></button>
+    <div class="header-actions">
+      <button class="settings-btn" onclick="openSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="settingsBtnText">Settings</span></button>
+      <button class="hist-icon-btn" onclick="openDrawer()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="histBtnText">History</span></button>
+    </div>
   </div>
 
   <p class="hero-lede" id="heroLede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
@@ -240,7 +254,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       </div>
       <div class="model-selected-label" id="modelSelectedLabel" style="display:none"></div>
     </div>
-    <button class="load-models-btn" id="loadModelsBtn" onclick="loadModels()">↻ Load models</button>
+    <button class="load-models-btn" id="loadModelsBtn" onclick="modelDropdown.classList.remove('open');loadModels()">↻ Load models</button>
   </div>
 
   <p class="model-lede" id="modelLede">A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.</p>
@@ -290,7 +304,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       <div class="block-out critique">
         <div class="block-head">
           <span class="block-head-label" id="critBlockLabel">Agents review each other's positions</span>
-          <div class="status-dot" id="critDot" style="margin-left:auto"></div>
+          <span class="status-icon" id="critDot"></span>
         </div>
         <div class="block-body empty" id="critBody">Waiting…</div>
       </div>
@@ -301,7 +315,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       <div class="block-out synth">
         <div class="block-head">
           <span class="block-head-label" id="synthBlockLabel">Final verdict</span>
-          <div class="status-dot" id="synthDot" style="margin-left:auto"></div>
+          <span class="status-icon" id="synthDot"></span>
         </div>
         <div class="block-body empty" id="synthBody">Waiting…</div>
       </div>
@@ -431,6 +445,7 @@ const STRINGS = {
     settingsData: 'Dati',
     settingsLanguage: 'Lingua',
     settingsModelFavs: 'Modelli preferiti',
+    favouritesLabel: 'Preferiti',
     settingsCustomAgent: 'Agente personalizzato',
     settingsAgentColor: 'Colore tag agente',
     settingsExportHistory: 'Esporta cronologia',
@@ -438,6 +453,7 @@ const STRINGS = {
     settingsComingSoon: 'Prossimamente',
     settingsBtn: 'Impostazioni',
     historyBtn: 'Cronologia',
+    alertNoModel: 'Seleziona un modello prima di continuare',
     alertNoDecision: 'Descrivi la decisione da valutare',
     alertNeedAgents: n => `Seleziona almeno ${n} agenti`,
     premortPrompt: (name, bias, decisionBlock) => `Sono passati 12 mesi. Questa decisione è fallita.\n\n${decisionBlock}\n\nDal tuo punto di vista (${name}, bias: ${bias}), cosa ha causato il fallimento? Max 3 bullet point, sii specifico.`,
@@ -485,6 +501,7 @@ const STRINGS = {
     settingsData: 'Data',
     settingsLanguage: 'Language',
     settingsModelFavs: 'Model favourites',
+    favouritesLabel: 'Favourites',
     settingsCustomAgent: 'Custom agent',
     settingsAgentColor: 'Agent tag colour',
     settingsExportHistory: 'Export history',
@@ -492,6 +509,7 @@ const STRINGS = {
     settingsComingSoon: 'Coming soon',
     settingsBtn: 'Settings',
     historyBtn: 'History',
+    alertNoModel: 'Select a model before continuing',
     alertNoDecision: 'Describe the decision to evaluate',
     alertNeedAgents: n => `Select at least ${n} agents`,
     premortPrompt: (name, bias, decisionBlock) => `It is 12 months from now. This decision has failed.\n\n${decisionBlock}\n\nFrom your perspective (${name}, bias: ${bias}), what caused the failure? Max 3 bullet points, be specific.`,
@@ -607,16 +625,29 @@ const TIERS = {
 };
 
 let selectedAgents = new Set(['devil','risk','expert']);
-let selectedModel  = 'anthropic/claude-sonnet-4-5';
+let selectedModel  = '';
 let selectedMode   = 'analyst';
 let selectedTier   = 'full';
 let allModels      = [];
+
+// ── Favourites ────────────────────────────────────────────
+const FAVOURITES_KEY = 'quorum-favourites';
+function loadFavourites(){ try{ return JSON.parse(localStorage.getItem(FAVOURITES_KEY)||'[]'); }catch{ return []; } }
+function saveFavourites(arr){ localStorage.setItem(FAVOURITES_KEY, JSON.stringify(arr)); }
+function isFavourite(modelId){ return loadFavourites().includes(modelId); }
+function toggleFavourite(modelId){
+  const favs = loadFavourites();
+  const idx = favs.indexOf(modelId);
+  if(idx >= 0) favs.splice(idx,1); else favs.push(modelId);
+  saveFavourites(favs);
+  renderDropdown(modelSearchEl.value);
+}
 
 // ── Model search ──────────────────────────────────────────
 const modelSearchEl  = document.getElementById('modelSearch');
 const modelDropdown  = document.getElementById('modelDropdown');
 const modelLabel     = document.getElementById('modelSelectedLabel');
-modelSearchEl.value  = selectedModel;
+modelSearchEl.value  = '';
 
 async function loadModels(){
   modelDropdown.innerHTML = '<div class="model-status">Loading…</div>';
@@ -634,20 +665,35 @@ async function loadModels(){
 }
 
 modelSearchEl.addEventListener('focus', ()=>{ if(allModels.length) { renderDropdown(modelSearchEl.value); modelDropdown.classList.add('open'); } });
-modelSearchEl.addEventListener('input', ()=> renderDropdown(modelSearchEl.value));
+modelSearchEl.addEventListener('input', ()=>{ if(allModels.length) modelDropdown.classList.add('open'); renderDropdown(modelSearchEl.value); });
 document.addEventListener('click', e=>{ if(!e.target.closest('.model-wrap') && !e.target.closest('.load-models-btn')) modelDropdown.classList.remove('open'); });
 
 function renderDropdown(q){
-  const q2 = q.toLowerCase();
-  const list = allModels.filter(m => m.id.toLowerCase().includes(q2)||(m.name||'').toLowerCase().includes(q2)).slice(0,50);
+  const S = STRINGS[currentLang];
+  const q2 = q.trim().toLowerCase();
+  const list = q2
+    ? allModels.filter(m => m.id.toLowerCase().includes(q2)||(m.name||'').toLowerCase().includes(q2)).slice(0,50)
+    : allModels;
   if(!list.length){ modelDropdown.innerHTML='<div class="model-status">No matches</div>'; return; }
-  modelDropdown.innerHTML = list.map(m=>{
+  const favIds = new Set(loadFavourites());
+  const favs = list.filter(m => favIds.has(m.id));
+  const rest = list.filter(m => !favIds.has(m.id));
+  function optHtml(m){
     const price = m.pricing?.prompt ? `$${(parseFloat(m.pricing.prompt)*1e6).toFixed(3)}/M` : '';
-    return `<div class="model-opt" onclick="selectModel('${m.id}')">
-      <span>${m.name||m.id}</span><span class="mprice">${price}</span>
-      <div class="mid">${m.id}</div>
-    </div>`;
-  }).join('');
+    const fav = favIds.has(m.id);
+    return `<div class="model-opt" onclick="selectModel('${m.id}')">` +
+      `<button class="model-opt-star${fav?' active':''}" onclick="event.stopPropagation();toggleFavourite('${m.id}')">${fav?'★':'☆'}</button>` +
+      `<div class="model-opt-content"><span>${m.name||m.id}</span><span class="mprice">${price}</span>` +
+      `<div class="mid">${m.id}</div></div></div>`;
+  }
+  let html = '';
+  if(favs.length){
+    html += `<span class="model-fav-label">${S.favouritesLabel}</span>`;
+    html += favs.map(optHtml).join('');
+    html += '<div class="model-fav-divider"></div>';
+  }
+  html += rest.map(optHtml).join('');
+  modelDropdown.innerHTML = html;
 }
 
 function selectModel(id){
@@ -760,6 +806,7 @@ async function callProxy(messages){
 // ── Run panel ─────────────────────────────────────────────
 async function runPanel(){
   const S = STRINGS[currentLang];
+  if(!selectedModel){ alert(S.alertNoModel); return; }
   const decision = document.getElementById('decisionInput').value.trim();
   if(!decision){ alert(S.alertNoDecision); return; }
   const minAgents = selectedTier === 'quick' ? 2 : 3;
@@ -793,7 +840,7 @@ async function runPanel(){
         <span class="agent-badge">${aName}</span>
         <span class="agent-out-desc">${aDesc}</span>
         <span class="agent-chevron">▼</span>
-        <div class="status-dot"></div>
+        <span class="status-icon"></span>
       </div>
       <div class="agent-out-body empty" id="ab-${a.id}">${S.analyzing}</div>
     </div>`;
@@ -827,7 +874,7 @@ async function runPanel(){
   if(selectedTier === 'quick'){
     const synthDot  = document.getElementById('synthDot');
     const synthBody = document.getElementById('synthBody');
-    synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+    synthDot.textContent = '⟳'; synthDot.style.cssText = 'color:var(--accent);animation:spin 1s linear infinite';
     synthBody.classList.remove('empty');
     synthBody.textContent = S.synthesizing;
     try{
@@ -842,14 +889,14 @@ async function runPanel(){
       synthBody.classList.remove('empty');
       synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
         `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
-      synthDot.style.cssText = 'background:var(--accent2);animation:none';
+      synthDot.textContent = '✓'; synthDot.style.cssText = 'color:#2a9d5c';
       currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
         agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[]};
       saveSession(currentSession);
       document.getElementById('exportBtn').style.display = '';
     }catch(e){
       synthBody.textContent = `Error: ${e.message}`;
-      synthDot.style.cssText = 'background:var(--danger);animation:none';
+      synthDot.textContent = '✕'; synthDot.style.cssText = 'color:var(--danger)';
     }
     return;
   }
@@ -857,7 +904,7 @@ async function runPanel(){
   // Phase 2 — cross-critique
   const critDot  = document.getElementById('critDot');
   const critBody = document.getElementById('critBody');
-  critDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+  critDot.textContent = '⟳'; critDot.style.cssText = 'color:var(--accent);animation:spin 1s linear infinite';
   critBody.classList.remove('empty');
   critBody.textContent = S.analyzing;
 
@@ -868,16 +915,16 @@ async function runPanel(){
       {role:'user',   content: critPromptFn(decision, analysesBlock)}
     ]);
     critBody.textContent = critique;
-    critDot.style.cssText = 'background:var(--accent2);animation:none';
+    critDot.textContent = '✓'; critDot.style.cssText = 'color:#2a9d5c';
   }catch(e){
     critBody.textContent = `Error: ${e.message}`;
-    critDot.style.cssText = 'background:var(--danger);animation:none';
+    critDot.textContent = '✕'; critDot.style.cssText = 'color:var(--danger)';
   }
 
   // Phase 3 — synthesis
   const synthDot  = document.getElementById('synthDot');
   const synthBody = document.getElementById('synthBody');
-  synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
+  synthDot.textContent = '⟳'; synthDot.style.cssText = 'color:var(--accent);animation:spin 1s linear infinite';
   synthBody.classList.remove('empty');
   synthBody.textContent = S.synthesizing;
 
@@ -895,10 +942,10 @@ async function runPanel(){
     synthBody.classList.remove('empty');
     synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
       `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
-    synthDot.style.cssText = 'background:var(--accent2);animation:none';
+    synthDot.textContent = '✓'; synthDot.style.cssText = 'color:#2a9d5c';
   }catch(e){
     synthBody.textContent = `Error: ${e.message}`;
-    synthDot.style.cssText = 'background:var(--danger);animation:none';
+    synthDot.textContent = '✕'; synthDot.style.cssText = 'color:var(--danger)';
   }
 
   // Phase 4 — pre-mortem (parallel)
@@ -912,7 +959,7 @@ async function runPanel(){
         <span class="agent-badge">${aName}</span>
         <span class="agent-out-desc">${aDesc}</span>
         <span class="agent-chevron">▼</span>
-        <div class="status-dot"></div>
+        <span class="status-icon"></span>
       </div>
       <div class="agent-out-body empty" id="pb-${a.id}">${S.analyzing}</div>
     </div>`;
@@ -961,7 +1008,9 @@ function resetPanel(){
     el.className = 'block-body empty';
   });
   ['critDot','synthDot'].forEach(id=>{
-    document.getElementById(id).style.cssText = '';
+    const el = document.getElementById(id);
+    el.style.cssText = '';
+    el.textContent = '';
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1099,7 +1148,7 @@ function restoreSession(id){
         <span class="agent-badge">${escHtml(a.name)}</span>
         <span class="agent-out-desc"></span>
         <span class="agent-chevron">&#9654;</span>
-        <div class="status-dot"></div>
+        <span class="status-icon"></span>
       </div>
       <div class="agent-out-body"></div>
     </div>`;
@@ -1113,7 +1162,8 @@ function restoreSession(id){
     const critBody = document.getElementById('critBody');
     critBody.textContent = s.critique;
     critBody.classList.remove('empty');
-    document.getElementById('critDot').style.cssText = 'background:var(--accent2);animation:none';
+    const critDotEl = document.getElementById('critDot');
+    critDotEl.textContent = '✓'; critDotEl.style.cssText = 'color:#2a9d5c';
   }
 
   if(s.synthesis){
@@ -1125,7 +1175,8 @@ function restoreSession(id){
     synthBody.classList.remove('empty');
     synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>`+
       `<div style="white-space:pre-wrap">${s.synthesis.split('\n').slice(1).join('\n').trim()}</div>`;
-    document.getElementById('synthDot').style.cssText = 'background:var(--accent2);animation:none';
+    const synthDotEl = document.getElementById('synthDot');
+    synthDotEl.textContent = '✓'; synthDotEl.style.cssText = 'color:#2a9d5c';
   }
 
   if(s.premortem && s.premortem.length){
@@ -1138,7 +1189,7 @@ function restoreSession(id){
           <span class="agent-badge">${escHtml(a.name)}</span>
           <span class="agent-out-desc"></span>
           <span class="agent-chevron">&#9654;</span>
-          <div class="status-dot"></div>
+          <span class="status-icon"></span>
         </div>
         <div class="agent-out-body"></div>
       </div>`;
@@ -1249,6 +1300,7 @@ function applyLang(lang){
 }
 
 applyLang(currentLang);
+loadModels();
 </script>
 </body>
 </html>
