@@ -646,22 +646,26 @@ const TIERS = {
   },
 };
 
-let selectedAgents = new Set(['devil','risk','expert']);
-let selectedModel  = '';
-let selectedMode   = 'analyst';
-let selectedTier   = 'full';
-let allModels      = [];
+let selectedAgents  = new Set(['devil','risk','expert']);
+let selectedModel   = '';
+let selectedMode    = 'analyst';
+let selectedTier    = 'full';
+let allModels       = [];
+let historyCache    = [];
+let favouritesCache = [];
 
 // ── Favourites ────────────────────────────────────────────
-const FAVOURITES_KEY = 'quorum-favourites';
-function loadFavourites(){ try{ return JSON.parse(localStorage.getItem(FAVOURITES_KEY)||'[]'); }catch{ return []; } }
-function saveFavourites(arr){ localStorage.setItem(FAVOURITES_KEY, JSON.stringify(arr)); }
-function isFavourite(modelId){ return loadFavourites().includes(modelId); }
+function loadFavourites(){ return favouritesCache; }
+function isFavourite(modelId){ return favouritesCache.includes(modelId); }
 function toggleFavourite(modelId){
-  const favs = loadFavourites();
-  const idx = favs.indexOf(modelId);
-  if(idx >= 0) favs.splice(idx,1); else favs.push(modelId);
-  saveFavourites(favs);
+  const idx = favouritesCache.indexOf(modelId);
+  if(idx >= 0){
+    favouritesCache.splice(idx, 1);
+    fetch('/api/favourites/'+modelId, {method:'DELETE'});
+  } else {
+    favouritesCache.push(modelId);
+    fetch('/api/favourites', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({model_id:modelId})});
+  }
   renderDropdown(modelSearchEl.value);
 }
 
@@ -1038,22 +1042,17 @@ function resetPanel(){
 }
 
 // ── Session storage ───────────────────────────────────────
-const HISTORY_KEY = 'quorum-history';
 const HISTORY_MAX = 50;
 let currentSession = null;
 
 function saveSession(session){
-  let history = loadHistory();
-  history.unshift(session);
-  if(history.length > HISTORY_MAX) history = history.slice(0, HISTORY_MAX);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  historyCache.unshift(session);
+  if(historyCache.length > HISTORY_MAX) historyCache = historyCache.slice(0, HISTORY_MAX);
   renderHistoryDrawer();
+  fetch('/api/history', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(session)});
 }
 
-function loadHistory(){
-  try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }
-  catch{ return []; }
-}
+function loadHistory(){ return historyCache; }
 
 function extractVerdict(synthText){
   if(!synthText) return null;
@@ -1125,16 +1124,16 @@ function toggleSelectAll(checked){
 }
 
 function deleteEntry(id){
-  let history = loadHistory().filter(s => String(s.id) !== String(id));
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  historyCache = historyCache.filter(s => String(s.id) !== String(id));
   renderHistoryDrawer();
+  fetch('/api/history/'+id, {method:'DELETE'});
 }
 
 function deleteSelected(){
   const ids = new Set([...document.querySelectorAll('.hist-entry-cb:checked')].map(cb=>cb.dataset.id));
-  let history = loadHistory().filter(s => !ids.has(String(s.id)));
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  historyCache = historyCache.filter(s => !ids.has(String(s.id)));
   renderHistoryDrawer();
+  ids.forEach(id => fetch('/api/history/'+id, {method:'DELETE'}));
 }
 
 function restoreSession(id){
@@ -1321,7 +1320,32 @@ function applyLang(lang){
   renderHistoryDrawer();
 }
 
+async function migrateFromLocalStorage(){
+  const lsHistory = (() => { try{ return JSON.parse(localStorage.getItem('quorum-history')||'[]'); }catch{ return []; } })();
+  const lsFavs    = (() => { try{ return JSON.parse(localStorage.getItem('quorum-favourites')||'[]'); }catch{ return []; } })();
+  const [serverHistory, serverFavs] = await Promise.all([
+    fetch('/api/history').then(r => r.json()).catch(() => []),
+    fetch('/api/favourites').then(r => r.json()).catch(() => []),
+  ]);
+  if(serverHistory.length === 0 && lsHistory.length > 0){
+    await Promise.all(lsHistory.map(s => fetch('/api/history', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(s)})));
+    historyCache = lsHistory;
+    localStorage.removeItem('quorum-history');
+  } else {
+    historyCache = serverHistory;
+  }
+  if(serverFavs.length === 0 && lsFavs.length > 0){
+    await Promise.all(lsFavs.map(m => fetch('/api/favourites', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({model_id:m})})));
+    favouritesCache = lsFavs;
+    localStorage.removeItem('quorum-favourites');
+  } else {
+    favouritesCache = serverFavs;
+  }
+  renderHistoryDrawer();
+}
+
 applyLang(currentLang);
+migrateFromLocalStorage();
 loadModels();
 </script>
 </body>

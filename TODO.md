@@ -12,8 +12,8 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 - [x] Visualizzazione storico nella UI (lista compatta, click per riaprire)
 - [x] Funzione cancella: singola voce o svuota tutto
 - [x] Settings drawer scaffold (Preferences, Agents, Data) con placeholder "Coming soon"
-- [ ] Selettore lingua ITA/ENG — traduzione UI e prompt degli agenti
-- [ ] Model preferiti: stella sul dropdown, salvataggio localStorage, sezione preferiti in cima alla lista
+- [x] Selettore lingua ITA/ENG — traduzione UI e prompt degli agenti
+- [x] Model preferiti: stella sul dropdown, salvataggio localStorage, sezione preferiti in cima alla lista
 - [ ] Agente custom: form in Settings > Agents — nome, bias, colore, system prompt. Appare come settima card selezionabile.
 - [ ] Agente custom: modello opzionale per-agente — override del modello globale per singolo agente (mix di modelli nella stessa run)
 
@@ -24,7 +24,7 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 - [ ] Confronto tra due decisioni in parallelo
 - [ ] Modalità "Devil's Panel" — tutti gli agenti con bias skeptic
 - [ ] Integrazione webhook (es. notifica Telegram al termine)
-- [ ] Persistenza server-side con SQLite — con import una-tantum da localStorage
+- [x] Persistenza server-side con SQLite — con import una-tantum da localStorage
 - [ ] Supporto multi-utente (autenticazione base, fuori scope LAN-only per ora)
 - [ ] Bias per agente selezionabile dall'utente (toggle skeptic/advocate/investigative su ogni card) — valutare se aggiunge valore o confusione
 - [ ] Company profile: persistent context per user — requires authentication first

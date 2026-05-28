@@ -8,3 +8,4 @@ services:
     restart: unless-stopped
     volumes:
       - ./public:/app/public
+      - ./data:/app/data

@@ -1,5 +1,16 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.4.5 — Migrazione SQLite per history e favourites
+*2026-05-28*
+
+- Dockerfile: aggiunto build toolchain alpine (python3, make, g++) per compilare better-sqlite3
+- package.json: dipendenza better-sqlite3 ^9.4.3
+- server.js: inizializzazione DB SQLite in /app/data/quorum.db con tabelle history, favourites, agents; createRequire per compatibilità ESM
+- Route REST: GET/POST/DELETE /api/history, GET/POST/DELETE /api/favourites, GET/POST/DELETE /api/agents
+- docker-compose.yml: volume ./data:/app/data
+- Frontend: sostituiti tutti gli accessi localStorage per history e favourites con fetch verso le nuove API; cache client-side (historyCache, favouritesCache) con aggiornamento ottimistico
+- migrateFromLocalStorage(): controlla se DB è vuoto, importa dati da localStorage, poi rimuove le chiavi
+
 ## v0.4.1 — Mobile fix, UI polish, token limits
 *2026-05-28*
 
