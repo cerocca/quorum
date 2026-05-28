@@ -1,5 +1,18 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.4.1 — Mobile fix, UI polish, token limits
+*2026-05-28*
+
+- Mobile layout: header grid, icon-only buttons, full-width model input, inline tag chip
+- Model favourites: auto-load on page start, starred models always pinned at top
+- Status indicators: dots replaced with ✓/⟳/✕ icons on agent cards
+- Done-state badge: reverted to neutral color, only icon signals completion
+- Font: system-ui applied to input labels and textareas
+- Header buttons: grouped right in .header-actions
+- max_tokens increased: 1200 for Phase 1/4, 2000 for Phase 2/3
+- Model search slash bug fixed
+- History and Settings drawers: full-width on mobile
+
 ## v0.4 — Light theme, UI copy, history & export
 *2026-05-27*
 

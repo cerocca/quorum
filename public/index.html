@@ -228,6 +228,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .lang-toggle{display:flex;gap:4px}
 .lang-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .15s}
 .lang-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+@media(max-width:600px){
+  html,body{overflow-x:hidden;max-width:100%}
+  .app{padding:16px 16px 80px}
+  .header{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:start;gap:0 8px}
+  .header h1{grid-column:1;grid-row:1;font-size:20px}
+  .header .tag{grid-column:1;grid-row:2;margin-top:4px;display:inline-block !important;width:auto !important;align-self:flex-start;justify-self:start}
+  .header-actions{grid-column:2;grid-row:1/3;flex-direction:column;gap:4px;align-items:flex-end;align-self:start}
+  .header-actions .settings-btn,.header-actions .hist-icon-btn{width:32px;height:32px;padding:0;display:flex;align-items:center;justify-content:center;min-width:unset;font-size:11px}
+  .header-actions .settings-btn span,.header-actions .hist-icon-btn span{display:none}
+  .hero-lede{white-space:normal;font-size:13px}
+  #modeGrid,#tierGrid{grid-template-columns:1fr !important}
+  .agents-grid{grid-template-columns:repeat(2,1fr)}
+  .model-section{flex-direction:column;gap:8px;align-items:stretch}
+  .model-wrap,.model-input{width:100%}
+  .load-models-btn{width:100%;margin-top:8px;align-self:stretch}
+  .agent-out-head{flex-wrap:wrap}
+  .agent-out-body{font-size:13px;padding:12px}
+  .block-body{font-size:13px;padding:12px}
+  .hist-drawer{width:100vw}
+  .drawer{width:100vw}
+}
 </style>
 </head>
 <body>
@@ -792,11 +814,11 @@ function toggleCard(cardId){
 }
 
 // ── API proxy calls ───────────────────────────────────────
-async function callProxy(messages){
+async function callProxy(messages, max_tokens){
   const r = await fetch('/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({model: selectedModel, max_tokens: 600, messages})
+    body: JSON.stringify({model: selectedModel, max_tokens, messages})
   });
   const d = await r.json();
   if(d.error) throw new Error(d.error.message||'API error');
@@ -854,7 +876,7 @@ async function runPanel(){
       const res = await callProxy([
         {role:'system', content: agentSystem},
         {role:'user',   content: decisionBlock}
-      ]);
+      ], 1200);
       results[a.id] = res;
       document.getElementById(`ab-${a.id}`).textContent = res;
       document.getElementById(`ab-${a.id}`).classList.remove('empty');
@@ -881,7 +903,7 @@ async function runPanel(){
       const synth = await callProxy([
         {role:'system', content: synthSys},
         {role:'user',   content: synthPromptFn(decision, analysesBlock, '')}
-      ]);
+      ], 2000);
       const firstLine = synth.split('\n')[0]||'';
       let vclass = 'conditional';
       if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
@@ -913,7 +935,7 @@ async function runPanel(){
     critique = await callProxy([
       {role:'system', content: critSys},
       {role:'user',   content: critPromptFn(decision, analysesBlock)}
-    ]);
+    ], 2000);
     critBody.textContent = critique;
     critDot.textContent = '✓'; critDot.style.cssText = 'color:#2a9d5c';
   }catch(e){
@@ -933,7 +955,7 @@ async function runPanel(){
     const synth = await callProxy([
       {role:'system', content: synthSys},
       {role:'user',   content: synthPromptFn(decision, analysesBlock, critique)}
-    ]);
+    ], 2000);
     synthText = synth;
     const firstLine = synth.split('\n')[0]||'';
     let vclass = 'conditional';
@@ -971,7 +993,7 @@ async function runPanel(){
       const res = await callProxy([
         {role:'system', content: agentSystem},
         {role:'user',   content: S.premortPrompt(a.name, a.bias, decisionBlock)}
-      ]);
+      ], 1200);
       pmResults[a.id] = res;
       document.getElementById(`pb-${a.id}`).textContent = res;
       document.getElementById(`pb-${a.id}`).classList.remove('empty');

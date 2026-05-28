@@ -82,11 +82,11 @@ Open `http://localhost:3003` (or `http://<your-server>:3003` on LAN).
 ## Roadmap
 
 ### v0.5 — planned
-- ITA/ENG language selector
+- Custom agent: user-defined name, bias, color and system prompt
+- Per-agent model override (mix models in a single run)
 - Company profile: persistent context injected into every call
 
 ### Backlog
-- Custom agent: user-defined name, bias and system prompt
 - Side-by-side comparison of two decisions
 - Devil's Panel mode: all agents with skeptic bias
 - Telegram webhook notification on completion

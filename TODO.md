@@ -15,6 +15,7 @@ Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
 - [ ] Selettore lingua ITA/ENG — traduzione UI e prompt degli agenti
 - [ ] Model preferiti: stella sul dropdown, salvataggio localStorage, sezione preferiti in cima alla lista
 - [ ] Agente custom: form in Settings > Agents — nome, bias, colore, system prompt. Appare come settima card selezionabile.
+- [ ] Agente custom: modello opzionale per-agente — override del modello globale per singolo agente (mix di modelli nella stessa run)
 
 ---
 
