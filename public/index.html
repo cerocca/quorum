@@ -211,6 +211,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .settings-row:last-child{border-bottom:none}
 .settings-row-label{font-size:13px;color:var(--text)}
 .settings-row-value.placeholder{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
+
+/* Language toggle */
+.lang-toggle{display:flex;gap:4px}
+.lang-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .15s}
+.lang-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
 </style>
 </head>
 <body>
@@ -218,15 +223,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
   <div class="header">
     <h1>Quorum</h1>
-    <span class="tag">multi-agent decision panel</span>
-    <button class="settings-btn" onclick="openSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
-    <button class="hist-icon-btn" onclick="openDrawer()" title="Session history"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>History</button>
+    <span class="tag" id="headerTag">multi-agent decision panel</span>
+    <button class="settings-btn" onclick="openSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="settingsBtnText">Settings</span></button>
+    <button class="hist-icon-btn" onclick="openDrawer()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="histBtnText">History</span></button>
   </div>
 
-  <p class="hero-lede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
+  <p class="hero-lede" id="heroLede">A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.</p>
 
   <!-- Model selector -->
-  <div class="sec-label">Model</div>
+  <div class="sec-label" id="modelSecLabel">Model</div>
   <div class="model-section">
     <div style="flex:1;min-width:200px">
       <div class="model-wrap">
@@ -235,20 +240,20 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       </div>
       <div class="model-selected-label" id="modelSelectedLabel" style="display:none"></div>
     </div>
-    <button class="load-models-btn" onclick="loadModels()">↻ Load models</button>
+    <button class="load-models-btn" id="loadModelsBtn" onclick="loadModels()">↻ Load models</button>
   </div>
 
-  <p class="model-lede">A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.</p>
+  <p class="model-lede" id="modelLede">A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.</p>
 
   <!-- Judge mode -->
   <div class="agents-section">
-    <div class="sec-label">Judge mode</div>
+    <div class="sec-label" id="judgeModeSecLabel">Judge mode</div>
     <div class="agents-grid" style="grid-template-columns:repeat(2,1fr)" id="modeGrid"></div>
   </div>
 
   <!-- Engagement tier -->
   <div class="agents-section">
-    <div class="sec-label">Engagement tier</div>
+    <div class="sec-label" id="engagementTierSecLabel">Engagement tier</div>
     <div class="agents-grid" style="grid-template-columns:repeat(2,1fr)" id="tierGrid"></div>
   </div>
 
@@ -261,12 +266,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
   <!-- Decision -->
   <div class="input-section">
-    <label>The decision</label>
+    <label id="decisionLabel">The decision</label>
     <textarea id="decisionInput" placeholder="Describe the decision you need to validate…"></textarea>
-    <span class="brief-sublabel">Be specific — vague calls beget vague rulings.</span>
+    <span class="brief-sublabel" id="decisionSublabel">Be specific — vague calls beget vague rulings.</span>
   </div>
   <div class="input-section">
-    <label>Context / constraints (optional)</label>
+    <label id="contextLabel">Context / constraints (optional)</label>
     <textarea id="contextInput" placeholder="Background info, constraints, objectives…" style="min-height:64px"></textarea>
   </div>
 
@@ -276,15 +281,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   <div class="pipeline" id="pipeline" style="display:none">
 
     <div>
-      <div class="phase-label">Phase 1 — Agent analysis</div>
+      <div class="phase-label" id="phase1Label">Phase 1 — Agent analysis</div>
       <div id="agentOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
     <div id="phase2">
-      <div class="phase-label">Phase 2 — Cross-critique</div>
+      <div class="phase-label" id="phase2Label">Phase 2 — Cross-critique</div>
       <div class="block-out critique">
         <div class="block-head">
-          <span class="block-head-label">Agents review each other's positions</span>
+          <span class="block-head-label" id="critBlockLabel">Agents review each other's positions</span>
           <div class="status-dot" id="critDot" style="margin-left:auto"></div>
         </div>
         <div class="block-body empty" id="critBody">Waiting…</div>
@@ -292,10 +297,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     </div>
 
     <div>
-      <div class="phase-label">Phase 3 — Synthesis</div>
+      <div class="phase-label" id="phase3Label">Phase 3 — Synthesis</div>
       <div class="block-out synth">
         <div class="block-head">
-          <span class="block-head-label">Final verdict</span>
+          <span class="block-head-label" id="synthBlockLabel">Final verdict</span>
           <div class="status-dot" id="synthDot" style="margin-left:auto"></div>
         </div>
         <div class="block-body empty" id="synthBody">Waiting…</div>
@@ -303,12 +308,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     </div>
 
     <div id="phase4">
-      <div class="phase-label">Phase 4 — Pre-mortem</div>
+      <div class="phase-label" id="phase4Label">Phase 4 — Pre-mortem</div>
       <div id="premortOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="reset-btn" onclick="resetPanel()">← New decision</button>
+      <button class="reset-btn" id="resetBtn" onclick="resetPanel()">← New decision</button>
       <button class="reset-btn" id="exportBtn" onclick="exportSession()" style="display:none">↓ Export session</button>
     </div>
   </div>
@@ -319,8 +324,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 <div class="hist-overlay" id="histOverlay" onclick="closeDrawer()"></div>
 <div class="hist-drawer" id="histDrawer">
   <div class="hist-drawer-head">
-    <span class="hist-drawer-title">History</span>
-    <label class="hist-select-all-wrap"><input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this.checked)"> all</label>
+    <span class="hist-drawer-title" id="histDrawerTitle">History</span>
+    <label class="hist-select-all-wrap"><input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this.checked)"><span id="selectAllText"> all</span></label>
     <button class="hist-close-btn" onclick="closeDrawer()">&#xD7;</button>
   </div>
   <div class="hist-list" id="histList"></div>
@@ -333,44 +338,47 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 <div class="drawer-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
 <div class="drawer" id="settingsDrawer">
   <div class="drawer-header">
-    <span class="drawer-title">Settings</span>
+    <span class="drawer-title" id="settingsDrawerTitle">Settings</span>
     <button class="drawer-close" onclick="closeSettings()">×</button>
   </div>
   <div class="drawer-body">
 
     <div class="settings-section">
-      <div class="settings-section-label">Preferences</div>
+      <div class="settings-section-label" id="settingsPrefsLabel">Preferences</div>
       <div class="settings-row">
-        <span class="settings-row-label">Language</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
+        <span class="settings-row-label" id="settingsLangLabel">Language</span>
+        <div class="lang-toggle">
+          <button class="lang-btn" id="langBtnIta" onclick="applyLang('ita')">ITA</button>
+          <button class="lang-btn" id="langBtnEng" onclick="applyLang('eng')">ENG</button>
+        </div>
       </div>
       <div class="settings-row">
-        <span class="settings-row-label">Model favourites</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label">Agents</div>
-      <div class="settings-row">
-        <span class="settings-row-label">Custom agent</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-row-label">Agent tag colour</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
+        <span class="settings-row-label" id="settingsModelFavsLabel">Model favourites</span>
+        <span class="settings-row-value placeholder" id="settingsModelFavsVal">Coming soon</span>
       </div>
     </div>
 
     <div class="settings-section">
-      <div class="settings-section-label">Data</div>
+      <div class="settings-section-label" id="settingsAgentsLabel">Agents</div>
       <div class="settings-row">
-        <span class="settings-row-label">Export history</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
+        <span class="settings-row-label" id="settingsCustomAgentLabel">Custom agent</span>
+        <span class="settings-row-value placeholder" id="settingsCustomAgentVal">Coming soon</span>
       </div>
       <div class="settings-row">
-        <span class="settings-row-label">Clear all history</span>
-        <span class="settings-row-value placeholder">Coming soon</span>
+        <span class="settings-row-label" id="settingsAgentColorLabel">Agent tag colour</span>
+        <span class="settings-row-value placeholder" id="settingsAgentColorVal">Coming soon</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-label" id="settingsDataLabel">Data</div>
+      <div class="settings-row">
+        <span class="settings-row-label" id="settingsExportHistLabel">Export history</span>
+        <span class="settings-row-value placeholder" id="settingsExportHistVal">Coming soon</span>
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label" id="settingsClearHistLabel">Clear all history</span>
+        <span class="settings-row-value placeholder" id="settingsClearHistVal">Coming soon</span>
       </div>
     </div>
 
@@ -378,6 +386,121 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 </div>
 
 <script>
+// ── Strings ───────────────────────────────────────────────
+const STRINGS = {
+  ita: {
+    tag: 'multi-agent decision panel',
+    heroLede: "Un panel deliberativo a sei agenti per decisioni che non puoi permetterti di sbagliare.<br>Sei menti biasate discutono. Un Giudice emette GO, NO-GO o CONDIZIONALE.",
+    modelLabel: 'Modello',
+    modelPlaceholder: 'Cerca o inserisci un ID modello…',
+    loadModels: '↻ Carica modelli',
+    modelLede: 'Un singolo modello viene assegnato a tutti e sei gli agenti: il disaccordo è strutturale, non architetturale.',
+    judgeModeLabel: 'Modalità giudice',
+    judgeAnalystName: 'Analista',
+    judgeSentinelName: 'Sentinella',
+    engagementTierLabel: 'Livello di analisi',
+    agentsLabelFull: 'Agenti — seleziona da 3 a 5',
+    agentsLabelQuick: 'Agenti — seleziona da 2 a 3',
+    agentsNoteNeedMore: n => n === 1 ? 'Seleziona ancora 1 agente per continuare' : `Seleziona ancora ${n} agenti per continuare`,
+    agentsNoteSelected: n => n === 1 ? '1 agente selezionato' : `${n} agenti selezionati`,
+    agentsNoteMax: n => `${n} agenti selezionati (massimo)`,
+    decisionLabel: 'La decisione',
+    decisionPlaceholder: 'Descrivi la decisione da valutare…',
+    decisionSublabel: 'Sii specifico — domande vaghe generano risposte vaghe.',
+    contextLabel: 'Contesto / vincoli (opzionale)',
+    contextPlaceholder: 'Informazioni di sfondo, vincoli, obiettivi…',
+    runBtn: 'Avvia Quorum →',
+    phase1: 'Fase 1 — Analisi degli agenti',
+    phase2: 'Fase 2 — Critica incrociata',
+    phase3: 'Fase 3 — Sintesi',
+    phase4: 'Fase 4 — Pre-mortem',
+    critBlockLabel: 'Gli agenti valutano reciprocamente le proprie posizioni',
+    synthBlockLabel: 'Verdetto finale',
+    analyzing: 'Analisi in corso…',
+    synthesizing: 'Sintesi in corso…',
+    waiting: 'In attesa…',
+    newDecision: '← Nuova decisione',
+    exportSession: '↓ Esporta sessione',
+    historyTitle: 'Cronologia',
+    historyEmpty: 'Nessuna sessione salvata.',
+    historySelectAll: 'tutte',
+    historyDeleteSelected: n => `Elimina selezionati (${n})`,
+    settingsTitle: 'Impostazioni',
+    settingsPreferences: 'Preferenze',
+    settingsAgents: 'Agenti',
+    settingsData: 'Dati',
+    settingsLanguage: 'Lingua',
+    settingsModelFavs: 'Modelli preferiti',
+    settingsCustomAgent: 'Agente personalizzato',
+    settingsAgentColor: 'Colore tag agente',
+    settingsExportHistory: 'Esporta cronologia',
+    settingsClearHistory: 'Cancella cronologia',
+    settingsComingSoon: 'Prossimamente',
+    settingsBtn: 'Impostazioni',
+    historyBtn: 'Cronologia',
+    alertNoDecision: 'Descrivi la decisione da valutare',
+    alertNeedAgents: n => `Seleziona almeno ${n} agenti`,
+    premortPrompt: (name, bias, decisionBlock) => `Sono passati 12 mesi. Questa decisione è fallita.\n\n${decisionBlock}\n\nDal tuo punto di vista (${name}, bias: ${bias}), cosa ha causato il fallimento? Max 3 bullet point, sii specifico.`,
+  },
+  eng: {
+    tag: 'multi-agent decision panel',
+    heroLede: "A six-agent deliberation panel for decisions you can't afford to get wrong.<br>Six biased minds argue. A Judge rules GO, NO-GO, or CONDITIONAL.",
+    modelLabel: 'Model',
+    modelPlaceholder: 'Search or type model ID…',
+    loadModels: '↻ Load models',
+    modelLede: "A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.",
+    judgeModeLabel: 'Judge mode',
+    judgeAnalystName: 'Analyst',
+    judgeSentinelName: 'Sentinel',
+    engagementTierLabel: 'Engagement tier',
+    agentsLabelFull: 'Agents — select 3 to 5',
+    agentsLabelQuick: 'Agents — select 2 to 3',
+    agentsNoteNeedMore: n => `Select ${n} more agent${n > 1 ? 's' : ''} to continue`,
+    agentsNoteSelected: n => `${n} agent${n > 1 ? 's' : ''} selected`,
+    agentsNoteMax: n => `${n} agent${n > 1 ? 's' : ''} selected (maximum)`,
+    decisionLabel: 'The decision',
+    decisionPlaceholder: 'Describe the decision you need to validate…',
+    decisionSublabel: 'Be specific — vague calls beget vague rulings.',
+    contextLabel: 'Context / constraints (optional)',
+    contextPlaceholder: 'Background info, constraints, objectives…',
+    runBtn: 'Run Quorum →',
+    phase1: 'Phase 1 — Agent analysis',
+    phase2: 'Phase 2 — Cross-critique',
+    phase3: 'Phase 3 — Synthesis',
+    phase4: 'Phase 4 — Pre-mortem',
+    critBlockLabel: "Agents review each other's positions",
+    synthBlockLabel: 'Final verdict',
+    analyzing: 'Analyzing…',
+    synthesizing: 'Synthesizing…',
+    waiting: 'Waiting…',
+    newDecision: '← New decision',
+    exportSession: '↓ Export session',
+    historyTitle: 'History',
+    historyEmpty: 'No sessions yet.',
+    historySelectAll: 'all',
+    historyDeleteSelected: n => `Delete selected (${n})`,
+    settingsTitle: 'Settings',
+    settingsPreferences: 'Preferences',
+    settingsAgents: 'Agents',
+    settingsData: 'Data',
+    settingsLanguage: 'Language',
+    settingsModelFavs: 'Model favourites',
+    settingsCustomAgent: 'Custom agent',
+    settingsAgentColor: 'Agent tag colour',
+    settingsExportHistory: 'Export history',
+    settingsClearHistory: 'Clear all history',
+    settingsComingSoon: 'Coming soon',
+    settingsBtn: 'Settings',
+    historyBtn: 'History',
+    alertNoDecision: 'Describe the decision to evaluate',
+    alertNeedAgents: n => `Select at least ${n} agents`,
+    premortPrompt: (name, bias, decisionBlock) => `It is 12 months from now. This decision has failed.\n\n${decisionBlock}\n\nFrom your perspective (${name}, bias: ${bias}), what caused the failure? Max 3 bullet points, be specific.`,
+  },
+};
+
+let currentLang = localStorage.getItem('quorum-lang') || 'ita';
+
+// ── Bias chips ────────────────────────────────────────────
 const BIAS_CHIP = {
   'contrarian':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
   'risk-first':  {bg:'var(--chip-investigative-bg)', tx:'var(--chip-investigative-tx)'},
@@ -387,43 +510,100 @@ const BIAS_CHIP = {
   'harm-aware':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
 };
 
+// ── Agents ────────────────────────────────────────────────
 const AGENTS = [
-  {id:'devil', name:"Devil's Advocate", desc:"Hunts for hidden flaws and motivated reasoning. Inverts every claim before accepting it.", bias:'contrarian', color:'#ff5a5a',
-   system:`You are a Devil's Advocate with a skeptic bias. Your role is adversarial: dismantle every assumption, expose logical gaps, argue against the decision as if your job is to kill it. Do not soften your critique. Format: **Position** (1 sentence against) then **Key challenges** (3 bullet points max, each targeting a specific assumption).`},
-  {id:'risk',  name:"Risk Assessor",    desc:"Maps failure modes and tail risks. Names who pays the cost if this goes wrong.", bias:'risk-first', color:'#ff9f5a',
-   system:`You are a Risk Assessor with an investigative bias. Seek out failure modes aggressively. Treat absence of evidence as suspicious, not reassuring. Assume things will go wrong unless proven otherwise. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max, each with severity and specific failure path).`},
-  {id:'expert',name:"Domain Expert",    desc:"Weighs feasibility against effort. Refuses anything without a clean execution plan.", bias:'feasibility', color:'#5ab8ff',
-   system:`You are a Domain Expert with an investigative bias. Evaluate technical and operational feasibility by probing every gap. Flag missing information, unproven assumptions, and hidden complexity. Do not give the benefit of the doubt. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max, prioritize gaps and unknowns).`},
-  {id:'optimist',name:"Optimist",       desc:"Maps the upside path. Assumes systems compound. Anchors on the largest plausible win.", bias:'opportunity', color:'#e8ff5a',
-   system:`You are an Optimist with an advocate bias. Defend the decision. Find the undervalued upside, the overlooked opportunity, the asymmetric gain. Make the strongest possible case for moving forward. Format: **Upside potential** (1 sentence, make it compelling) then **Key opportunities** (3 bullet points max, be specific about value).`},
-  {id:'strategist',name:"Strategist",   desc:"Projects three moves ahead. Discounts the present in favor of second-order effects.", bias:'horizon', color:'#b85aff',
-   system:`You are a Strategist with an advocate bias. Argue for strategic alignment when defensible. Frame the decision in terms of long-term positioning and competitive advantage. If alignment is weak, say so briefly, but spend most effort on making the strongest strategic case. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`},
-  {id:'ethicist',name:"Ethicist",       desc:"Names who pays the cost and whether they consented to pay it. Flags the harm surface.", bias:'harm-aware', color:'#5affb8',
-   system:`You are an Ethicist/Regulator with a skeptic bias. Assume hidden risks until proven otherwise. Probe for compliance issues, ethical blind spots, reputational exposure, and stakeholder harm. Default to concern. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max, name specific stakeholders or regulations at risk).`},
+  {
+    id:'devil', name:"Devil's Advocate", name_ita:"Avvocato del Diavolo",
+    desc:"Hunts for hidden flaws and motivated reasoning. Inverts every claim before accepting it.",
+    desc_ita:"Cerca difetti nascosti e ragionamenti viziati. Inverte ogni affermazione prima di accettarla.",
+    bias:'contrarian', color:'#ff5a5a',
+    system:`You are a Devil's Advocate with a skeptic bias. Your role is adversarial: dismantle every assumption, expose logical gaps, argue against the decision as if your job is to kill it. Do not soften your critique. Format: **Position** (1 sentence against) then **Key challenges** (3 bullet points max, each targeting a specific assumption).`,
+    system_ita:`Sei un Avvocato del Diavolo con un bias scettico. Il tuo ruolo è avversariale: smonta ogni assunzione, esponi le lacune logiche, argomenta contro la decisione come se il tuo compito fosse affossarla. Non ammorbidire la critica. Formato: **Posizione** (1 frase contraria) poi **Sfide chiave** (max 3 bullet, ognuno puntato su un'assunzione specifica).`,
+  },
+  {
+    id:'risk', name:"Risk Assessor", name_ita:"Analista del Rischio",
+    desc:"Maps failure modes and tail risks. Names who pays the cost if this goes wrong.",
+    desc_ita:"Mappa i modi di fallimento e i rischi estremi. Nomina chi paga il costo se qualcosa va storto.",
+    bias:'risk-first', color:'#ff9f5a',
+    system:`You are a Risk Assessor with an investigative bias. Seek out failure modes aggressively. Treat absence of evidence as suspicious, not reassuring. Assume things will go wrong unless proven otherwise. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Top risks** (3 bullet points max, each with severity and specific failure path).`,
+    system_ita:`Sei un Analista del Rischio con un bias investigativo. Cerca modalità di fallimento in modo aggressivo. Tratta l'assenza di prove come sospetta, non rassicurante. Assumi che le cose andranno storte a meno che non venga dimostrato il contrario. Formato: **Livello di rischio** (BASSO/MEDIO/ALTO) poi **Rischi principali** (max 3 bullet, ognuno con gravità e percorso di fallimento specifico).`,
+  },
+  {
+    id:'expert', name:"Domain Expert", name_ita:"Esperto di Dominio",
+    desc:"Weighs feasibility against effort. Refuses anything without a clean execution plan.",
+    desc_ita:"Valuta la fattibilità rispetto all'impegno. Rifiuta tutto ciò che non ha un piano di esecuzione chiaro.",
+    bias:'feasibility', color:'#5ab8ff',
+    system:`You are a Domain Expert with an investigative bias. Evaluate technical and operational feasibility by probing every gap. Flag missing information, unproven assumptions, and hidden complexity. Do not give the benefit of the doubt. Format: **Feasibility** (LOW/MEDIUM/HIGH) then **Key observations** (3 bullet points max, prioritize gaps and unknowns).`,
+    system_ita:`Sei un Esperto di Dominio con un bias investigativo. Valuta la fattibilità tecnica e operativa sondando ogni lacuna. Segnala informazioni mancanti, assunzioni non dimostrate e complessità nascoste. Non concedere il beneficio del dubbio. Formato: **Fattibilità** (BASSA/MEDIA/ALTA) poi **Osservazioni chiave** (max 3 bullet, prioritizza lacune e incognite).`,
+  },
+  {
+    id:'optimist', name:"Optimist", name_ita:"Ottimista",
+    desc:"Maps the upside path. Assumes systems compound. Anchors on the largest plausible win.",
+    desc_ita:"Mappa il percorso di crescita. Assume che i sistemi si compongano. Punta al vantaggio più grande possibile.",
+    bias:'opportunity', color:'#e8ff5a',
+    system:`You are an Optimist with an advocate bias. Defend the decision. Find the undervalued upside, the overlooked opportunity, the asymmetric gain. Make the strongest possible case for moving forward. Format: **Upside potential** (1 sentence, make it compelling) then **Key opportunities** (3 bullet points max, be specific about value).`,
+    system_ita:`Sei un Ottimista con un bias da sostenitore. Difendi la decisione. Trova il vantaggio sottovalutato, l'opportunità trascurata, il guadagno asimmetrico. Costruisci il caso più solido possibile per andare avanti. Formato: **Potenziale di crescita** (1 frase convincente) poi **Opportunità chiave** (max 3 bullet, sii specifico sul valore).`,
+  },
+  {
+    id:'strategist', name:"Strategist", name_ita:"Stratega",
+    desc:"Projects three moves ahead. Discounts the present in favor of second-order effects.",
+    desc_ita:"Proietta tre mosse avanti. Sconta il presente a favore degli effetti di secondo ordine.",
+    bias:'horizon', color:'#b85aff',
+    system:`You are a Strategist with an advocate bias. Argue for strategic alignment when defensible. Frame the decision in terms of long-term positioning and competitive advantage. If alignment is weak, say so briefly, but spend most effort on making the strongest strategic case. Format: **Strategic fit** (WEAK/MODERATE/STRONG) then **Strategic considerations** (3 bullet points max).`,
+    system_ita:`Sei uno Stratega con un bias da sostenitore. Argomenta per l'allineamento strategico quando è difendibile. Inquadra la decisione in termini di posizionamento a lungo termine e vantaggio competitivo. Se l'allineamento è debole, dillo brevemente, ma dedica la maggior parte dell'impegno a costruire il caso strategico più solido. Formato: **Adeguatezza strategica** (DEBOLE/MODERATA/FORTE) poi **Considerazioni strategiche** (max 3 bullet).`,
+  },
+  {
+    id:'ethicist', name:"Ethicist", name_ita:"Eticista",
+    desc:"Names who pays the cost and whether they consented to pay it. Flags the harm surface.",
+    desc_ita:"Nomina chi paga il costo e se ha acconsentito a pagarlo. Segnala la superficie di danno.",
+    bias:'harm-aware', color:'#5affb8',
+    system:`You are an Ethicist/Regulator with a skeptic bias. Assume hidden risks until proven otherwise. Probe for compliance issues, ethical blind spots, reputational exposure, and stakeholder harm. Default to concern. Format: **Risk level** (LOW/MEDIUM/HIGH) then **Concerns** (3 bullet points max, name specific stakeholders or regulations at risk).`,
+    system_ita:`Sei un Eticista/Regolatore con un bias scettico. Assumi rischi nascosti finché non viene dimostrato il contrario. Sonda problemi di conformità, punti ciechi etici, esposizione reputazionale e danni agli stakeholder. Inclina verso la preoccupazione. Formato: **Livello di rischio** (BASSO/MEDIO/ALTO) poi **Preoccupazioni** (max 3 bullet, nomina stakeholder specifici o normative a rischio).`,
+  },
 ];
 
+// ── Judge modes ───────────────────────────────────────────
 const JUDGE_MODES = {
   analyst: {
     label: 'Analyst',
     desc: 'Calm. Synthesizing. Weighs trade-offs. Inclined to ship with conditions.',
+    desc_ita: 'Calmo. Sintetizzante. Valuta i compromessi. Incline a procedere con condizioni.',
     critSystem: 'You are a sharp, balanced debate moderator. Weigh all perspectives equally. No fluff.',
+    critSystem_ita: 'Sei un moderatore del dibattito acuto ed equilibrato. Valuta tutte le prospettive equamente. Niente fronzoli.',
     critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nIdentify: 1) 2-3 strongest consensus points, 2) 2-3 sharpest disagreements, 3) blind spots none addressed. Be concise.`,
+    critPrompt_ita: (decision, block) => `Decisione: ${decision}\n\nAnalisi degli agenti:\n${block}\n\nIdentifica: 1) 2-3 punti di consenso più forti, 2) 2-3 disaccordi più netti, 3) punti ciechi non affrontati da nessuno. Sii conciso.`,
     synthSystem: 'You are a decisive, balanced executive. Weigh all inputs before giving your verdict.',
+    synthSystem_ita: 'Sei un dirigente deciso ed equilibrato. Valuta tutti gli input prima di emettere il tuo verdetto.',
     synthPrompt: (decision, block, critique) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n2. Top 3 risks to monitor\n3. Recommended next step (1 sentence)`,
+    synthPrompt_ita: (decision, block, critique) => `Decisione: ${decision}\n\nAnalisi degli agenti:\n${block}\n\nRiepilogo del dibattito:\n${critique}\n\nProduci:\n1. Verdetto sulla prima riga nel formato: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidenza]%\n2. I 3 rischi principali da monitorare\n3. Prossimo passo consigliato (1 frase)`,
   },
   sentinel: {
     label: 'Sentinel',
     desc: 'Strict. Downside-first. Raises the bar. Inclined to defer until risk is named.',
+    desc_ita: 'Rigoroso. Prima il rischio. Alza il livello. Incline a rimandare finché il rischio non è nominato.',
     critSystem: 'You are a strict, risk-focused debate moderator. Prioritize downside scenarios. When in doubt, surface the risk. No fluff.',
+    critSystem_ita: 'Sei un moderatore del dibattito rigoroso, focalizzato sul rischio. Prioritizza gli scenari negativi. In caso di dubbio, porta alla luce il rischio. Niente fronzoli.',
     critPrompt: (decision, block) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nFocus on: 1) 2-3 most critical risks raised, 2) disagreements where the pessimistic view may be correct, 3) red flags that optimistic agents may have downplayed. Be concise.`,
+    critPrompt_ita: (decision, block) => `Decisione: ${decision}\n\nAnalisi degli agenti:\n${block}\n\nConcentrati su: 1) 2-3 rischi più critici emersi, 2) disaccordi in cui la visione pessimistica potrebbe essere corretta, 3) segnali d'allarme che gli agenti ottimistici potrebbero aver sottovalutato. Sii conciso.`,
     synthSystem: 'You are a risk-first executive. Your default is NO-GO unless evidence strongly supports proceeding. Uncertainty is not a reason to proceed.',
+    synthSystem_ita: "Sei un dirigente con approccio risk-first. Il tuo default è NO-GO a meno che le prove non supportino fortemente il procedere. L'incertezza non è un motivo per procedere.",
     synthPrompt: (decision, block, critique) => `Decision: ${decision}\n\nAgent analyses:\n${block}\n\nDebate summary:\n${critique}\n\nProduce:\n1. Verdict on first line as: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidence]%\n   Default to NO-GO if significant uncertainty remains.\n2. Top 3 risks that must be resolved before proceeding\n3. Minimum conditions required for a GO verdict (1-2 sentences)`,
+    synthPrompt_ita: (decision, block, critique) => `Decisione: ${decision}\n\nAnalisi degli agenti:\n${block}\n\nRiepilogo del dibattito:\n${critique}\n\nProduci:\n1. Verdetto sulla prima riga nel formato: VERDICT: [GO/NO-GO/CONDITIONAL] — [confidenza]%\n   Default a NO-GO se rimane incertezza significativa.\n2. I 3 rischi principali da risolvere prima di procedere\n3. Condizioni minime richieste per un verdetto GO (1-2 frasi)`,
   },
 };
 
+// ── Tiers ─────────────────────────────────────────────────
 const TIERS = {
-  full:  { label: 'Full',  desc: 'All phases · 3 to 5 agents · includes cross-critique and pre-mortem.' },
-  quick: { label: 'Quick', desc: 'Phase 1 + 3 only · 2 to 3 agents · fast ruling without critique.' },
+  full:  {
+    label: 'Full',
+    desc: 'All phases · 3 to 5 agents · includes cross-critique and pre-mortem.',
+    desc_ita: 'Tutte le fasi · da 3 a 5 agenti · include critica incrociata e pre-mortem.',
+  },
+  quick: {
+    label: 'Quick',
+    desc: 'Phase 1 + 3 only · 2 to 3 agents · fast ruling without critique.',
+    desc_ita: 'Solo Fase 1 + 3 · da 2 a 3 agenti · verdetto rapido senza critica.',
+  },
 };
 
 let selectedAgents = new Set(['devil','risk','expert']);
@@ -480,12 +660,16 @@ function selectModel(id){
 
 // ── Judge modes ───────────────────────────────────────────
 function renderModes(){
+  const S = STRINGS[currentLang];
+  const nameMap = { analyst: S.judgeAnalystName, sentinel: S.judgeSentinelName };
   document.getElementById('modeGrid').innerHTML = Object.entries(JUDGE_MODES).map(([key, m])=>{
     const active = selectedMode === key;
+    const label = nameMap[key] || m.label;
+    const desc = currentLang === 'ita' ? m.desc_ita : m.desc;
     return `<div class="agent-card ${active?'active':''}" onclick="selectMode('${key}')">
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:var(--text)">${m.label}</div>
-      <div class="agent-desc">${m.desc}</div>
+      <div class="agent-name" style="color:var(--text)">${label}</div>
+      <div class="agent-desc">${desc}</div>
     </div>`;
   }).join('');
 }
@@ -499,10 +683,11 @@ function selectMode(key){
 function renderTiers(){
   document.getElementById('tierGrid').innerHTML = Object.entries(TIERS).map(([key, t])=>{
     const active = selectedTier === key;
+    const desc = currentLang === 'ita' ? t.desc_ita : t.desc;
     return `<div class="agent-card ${active?'active':''}" onclick="selectTier('${key}')">
       <div class="agent-check">${active?'✓':''}</div>
       <div class="agent-name" style="color:var(--text)">${t.label}</div>
-      <div class="agent-desc">${t.desc}</div>
+      <div class="agent-desc">${desc}</div>
     </div>`;
   }).join('');
 }
@@ -519,26 +704,29 @@ function selectTier(key){
 
 // ── Agents ────────────────────────────────────────────────
 function renderAgents(){
+  const S = STRINGS[currentLang];
   const maxAgents = selectedTier === 'quick' ? 3 : 5;
+  const minAgents = selectedTier === 'quick' ? 2 : 3;
   document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
     const active  = selectedAgents.has(a.id);
     const locked  = !active && selectedAgents.size >= maxAgents;
     const chip    = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
+    const aName   = currentLang === 'ita' ? a.name_ita : a.name;
+    const aDesc   = currentLang === 'ita' ? a.desc_ita : a.desc;
     return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:var(--text)">${a.name}</div>
-      <div class="agent-desc">${a.desc}</div>
+      <div class="agent-name" style="color:var(--text)">${aName}</div>
+      <div class="agent-desc">${aDesc}</div>
       <span class="bias-chip" style="background:${chip.bg};color:${chip.tx}">${a.bias}</span>
     </div>`;
   }).join('');
   document.getElementById('agentsSectionLabel').textContent =
-    selectedTier === 'quick' ? 'Agents — select 2 to 3' : 'Agents — select 3 to 5';
+    selectedTier === 'quick' ? S.agentsLabelQuick : S.agentsLabelFull;
   const n = selectedAgents.size;
-  const minAgents = selectedTier === 'quick' ? 2 : 3;
   document.getElementById('agentsNote').textContent =
-    n < minAgents ? `Select ${minAgents-n} more agent${minAgents-n>1?'s':''} to continue` :
-    selectedTier === 'quick' ? `${n} agents selected (Quick mode)` :
-    `${n} agent${n>1?'s':''} selected${n===5?' (maximum)':''}`;
+    n < minAgents ? S.agentsNoteNeedMore(minAgents - n) :
+    n >= maxAgents ? S.agentsNoteMax(n) :
+    S.agentsNoteSelected(n);
 }
 
 function toggleAgent(id){
@@ -571,10 +759,11 @@ async function callProxy(messages){
 
 // ── Run panel ─────────────────────────────────────────────
 async function runPanel(){
+  const S = STRINGS[currentLang];
   const decision = document.getElementById('decisionInput').value.trim();
-  if(!decision){ alert('Describe the decision to evaluate'); return; }
+  if(!decision){ alert(S.alertNoDecision); return; }
   const minAgents = selectedTier === 'quick' ? 2 : 3;
-  if(selectedAgents.size < minAgents){ alert(`Select at least ${minAgents} agents`); return; }
+  if(selectedAgents.size < minAgents){ alert(S.alertNeedAgents(minAgents)); return; }
 
   currentSession = null;
   document.getElementById('exportBtn').style.display = 'none';
@@ -588,25 +777,35 @@ async function runPanel(){
   const context = document.getElementById('contextInput').value.trim();
   const decisionBlock = `Decision: ${decision}${context?'\n\nContext: '+context:''}`;
 
+  const mode = JUDGE_MODES[selectedMode];
+  const critSys      = currentLang === 'ita' ? mode.critSystem_ita   : mode.critSystem;
+  const critPromptFn = currentLang === 'ita' ? mode.critPrompt_ita   : mode.critPrompt;
+  const synthSys     = currentLang === 'ita' ? mode.synthSystem_ita  : mode.synthSystem;
+  const synthPromptFn= currentLang === 'ita' ? mode.synthPrompt_ita  : mode.synthPrompt;
+
   // Build phase 1 output cards
   const outEl = document.getElementById('agentOutputs');
-  outEl.innerHTML = agents.map(a=>`
-    <div class="agent-out running" id="ao-${a.id}">
+  outEl.innerHTML = agents.map(a=>{
+    const aName = currentLang === 'ita' ? a.name_ita : a.name;
+    const aDesc = currentLang === 'ita' ? a.desc_ita : a.desc;
+    return `<div class="agent-out running" id="ao-${a.id}">
       <div class="agent-out-head" onclick="toggleCard('ao-${a.id}')">
-        <span class="agent-badge">${a.name}</span>
-        <span class="agent-out-desc">${a.desc}</span>
+        <span class="agent-badge">${aName}</span>
+        <span class="agent-out-desc">${aDesc}</span>
         <span class="agent-chevron">▼</span>
         <div class="status-dot"></div>
       </div>
-      <div class="agent-out-body empty" id="ab-${a.id}">Analyzing…</div>
-    </div>`).join('');
+      <div class="agent-out-body empty" id="ab-${a.id}">${S.analyzing}</div>
+    </div>`;
+  }).join('');
 
   // Phase 1 — parallel
   const results = {};
   await Promise.all(agents.map(async a=>{
+    const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
       const res = await callProxy([
-        {role:'system', content: a.system},
+        {role:'system', content: agentSystem},
         {role:'user',   content: decisionBlock}
       ]);
       results[a.id] = res;
@@ -622,7 +821,6 @@ async function runPanel(){
     }
   }));
 
-  const mode          = JUDGE_MODES[selectedMode];
   const analysesBlock = agents.map(a=>`[${a.name}]:\n${results[a.id]}`).join('\n\n---\n\n');
 
   // Quick tier: skip Phase 2 and Phase 4
@@ -631,11 +829,11 @@ async function runPanel(){
     const synthBody = document.getElementById('synthBody');
     synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
     synthBody.classList.remove('empty');
-    synthBody.textContent = 'Synthesizing…';
+    synthBody.textContent = S.synthesizing;
     try{
       const synth = await callProxy([
-        {role:'system', content: mode.synthSystem},
-        {role:'user',   content: mode.synthPrompt(decision, analysesBlock, '')}
+        {role:'system', content: synthSys},
+        {role:'user',   content: synthPromptFn(decision, analysesBlock, '')}
       ]);
       const firstLine = synth.split('\n')[0]||'';
       let vclass = 'conditional';
@@ -661,13 +859,13 @@ async function runPanel(){
   const critBody = document.getElementById('critBody');
   critDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
   critBody.classList.remove('empty');
-  critBody.textContent = 'Analyzing…';
+  critBody.textContent = S.analyzing;
 
   let critique = '';
   try{
     critique = await callProxy([
-      {role:'system', content: mode.critSystem},
-      {role:'user',   content: mode.critPrompt(decision, analysesBlock)}
+      {role:'system', content: critSys},
+      {role:'user',   content: critPromptFn(decision, analysesBlock)}
     ]);
     critBody.textContent = critique;
     critDot.style.cssText = 'background:var(--accent2);animation:none';
@@ -681,21 +879,19 @@ async function runPanel(){
   const synthBody = document.getElementById('synthBody');
   synthDot.style.cssText = 'background:var(--accent);animation:pulse 1s infinite';
   synthBody.classList.remove('empty');
-  synthBody.textContent = 'Synthesizing…';
+  synthBody.textContent = S.synthesizing;
 
   let synthText = '';
   try{
     const synth = await callProxy([
-      {role:'system', content: mode.synthSystem},
-      {role:'user',   content: mode.synthPrompt(decision, analysesBlock, critique)}
+      {role:'system', content: synthSys},
+      {role:'user',   content: synthPromptFn(decision, analysesBlock, critique)}
     ]);
     synthText = synth;
-
     const firstLine = synth.split('\n')[0]||'';
     let vclass = 'conditional';
     if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
     else if(/NO-GO/.test(firstLine)) vclass = 'nogo';
-
     synthBody.classList.remove('empty');
     synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
       `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
@@ -708,22 +904,26 @@ async function runPanel(){
   // Phase 4 — pre-mortem (parallel)
   const pmResults = {};
   const pmEl = document.getElementById('premortOutputs');
-  pmEl.innerHTML = agents.map(a=>`
-    <div class="agent-out running" id="pm-${a.id}">
+  pmEl.innerHTML = agents.map(a=>{
+    const aName = currentLang === 'ita' ? a.name_ita : a.name;
+    const aDesc = currentLang === 'ita' ? a.desc_ita : a.desc;
+    return `<div class="agent-out running" id="pm-${a.id}">
       <div class="agent-out-head" onclick="toggleCard('pm-${a.id}')">
-        <span class="agent-badge">${a.name}</span>
-        <span class="agent-out-desc">${a.desc}</span>
+        <span class="agent-badge">${aName}</span>
+        <span class="agent-out-desc">${aDesc}</span>
         <span class="agent-chevron">▼</span>
         <div class="status-dot"></div>
       </div>
-      <div class="agent-out-body empty" id="pb-${a.id}">Analyzing…</div>
-    </div>`).join('');
+      <div class="agent-out-body empty" id="pb-${a.id}">${S.analyzing}</div>
+    </div>`;
+  }).join('');
 
   await Promise.all(agents.map(async a=>{
+    const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
       const res = await callProxy([
-        {role:'system', content: a.system},
-        {role:'user',   content: `It is 12 months from now. This decision has failed.\n\n${decisionBlock}\n\nFrom your perspective (${a.name}, bias: ${a.bias}), what caused the failure? Max 3 bullet points, be specific.`}
+        {role:'system', content: agentSystem},
+        {role:'user',   content: S.premortPrompt(a.name, a.bias, decisionBlock)}
       ]);
       pmResults[a.id] = res;
       document.getElementById(`pb-${a.id}`).textContent = res;
@@ -748,6 +948,7 @@ async function runPanel(){
 }
 
 function resetPanel(){
+  const S = STRINGS[currentLang];
   currentSession = null;
   document.getElementById('exportBtn').style.display = 'none';
   document.getElementById('pipeline').style.display = 'none';
@@ -756,7 +957,7 @@ function resetPanel(){
   document.getElementById('premortOutputs').innerHTML = '';
   ['critBody','synthBody'].forEach(id=>{
     const el = document.getElementById(id);
-    el.textContent = 'Waiting…';
+    el.textContent = S.waiting;
     el.className = 'block-body empty';
   });
   ['critDot','synthDot'].forEach(id=>{
@@ -809,13 +1010,14 @@ function closeDrawer(){
 }
 
 function renderHistoryDrawer(){
+  const S = STRINGS[currentLang];
   const history = loadHistory();
   const listEl = document.getElementById('histList');
   document.getElementById('selectAllCb').checked = false;
   document.getElementById('delSelBtn').style.display = 'none';
 
   if(!history.length){
-    listEl.innerHTML = '<div class="hist-empty">No sessions saved yet.<br>Run Quorum to start building history.</div>';
+    listEl.innerHTML = `<div class="hist-empty">${S.historyEmpty}</div>`;
     return;
   }
 
@@ -839,10 +1041,11 @@ function renderHistoryDrawer(){
 }
 
 function updateDelSelBtn(){
+  const S = STRINGS[currentLang];
   const checked = document.querySelectorAll('.hist-entry-cb:checked').length;
   const btn = document.getElementById('delSelBtn');
   btn.style.display = checked > 0 ? 'block' : 'none';
-  btn.textContent = `Delete selected (${checked})`;
+  btn.textContent = S.historyDeleteSelected(checked);
 }
 
 function toggleSelectAll(checked){
@@ -864,7 +1067,6 @@ function deleteSelected(){
 }
 
 function restoreSession(id){
-  console.log('restoreSession called', id);
   const s = loadHistory().find(h => String(h.id) === String(id));
   if(!s) return;
   closeDrawer();
@@ -984,10 +1186,69 @@ function exportSession(){
 function openSettings(){ document.getElementById('settingsDrawer').classList.add('open'); document.getElementById('settingsOverlay').classList.add('open'); }
 function closeSettings(){ document.getElementById('settingsDrawer').classList.remove('open'); document.getElementById('settingsOverlay').classList.remove('open'); }
 
-renderModes();
-renderTiers();
-renderAgents();
-renderHistoryDrawer();
+// ── Language ──────────────────────────────────────────────
+function applyLang(lang){
+  currentLang = lang;
+  localStorage.setItem('quorum-lang', lang);
+  const S = STRINGS[lang];
+
+  document.getElementById('headerTag').textContent       = S.tag;
+  document.getElementById('settingsBtnText').textContent = S.settingsBtn;
+  document.getElementById('histBtnText').textContent     = S.historyBtn;
+  document.getElementById('heroLede').innerHTML          = S.heroLede;
+  document.getElementById('modelSecLabel').textContent   = S.modelLabel;
+  document.getElementById('modelSearch').placeholder     = S.modelPlaceholder;
+  document.getElementById('loadModelsBtn').textContent   = S.loadModels;
+  document.getElementById('modelLede').textContent       = S.modelLede;
+  document.getElementById('judgeModeSecLabel').textContent     = S.judgeModeLabel;
+  document.getElementById('engagementTierSecLabel').textContent= S.engagementTierLabel;
+  document.getElementById('decisionLabel').textContent   = S.decisionLabel;
+  document.getElementById('decisionInput').placeholder   = S.decisionPlaceholder;
+  document.getElementById('decisionSublabel').textContent= S.decisionSublabel;
+  document.getElementById('contextLabel').textContent    = S.contextLabel;
+  document.getElementById('contextInput').placeholder    = S.contextPlaceholder;
+  document.getElementById('runBtn').textContent          = S.runBtn;
+  document.getElementById('phase1Label').textContent     = S.phase1;
+  document.getElementById('phase2Label').textContent     = S.phase2;
+  document.getElementById('critBlockLabel').textContent  = S.critBlockLabel;
+  document.getElementById('phase3Label').textContent     = S.phase3;
+  document.getElementById('synthBlockLabel').textContent = S.synthBlockLabel;
+  document.getElementById('phase4Label').textContent     = S.phase4;
+  document.getElementById('resetBtn').textContent        = S.newDecision;
+  document.getElementById('exportBtn').textContent       = S.exportSession;
+  document.getElementById('histDrawerTitle').textContent = S.historyTitle;
+  document.getElementById('selectAllText').textContent   = ' ' + S.historySelectAll;
+  document.getElementById('settingsDrawerTitle').textContent   = S.settingsTitle;
+  document.getElementById('settingsPrefsLabel').textContent    = S.settingsPreferences;
+  document.getElementById('settingsAgentsLabel').textContent   = S.settingsAgents;
+  document.getElementById('settingsDataLabel').textContent     = S.settingsData;
+  document.getElementById('settingsLangLabel').textContent     = S.settingsLanguage;
+  document.getElementById('settingsModelFavsLabel').textContent= S.settingsModelFavs;
+  document.getElementById('settingsModelFavsVal').textContent  = S.settingsComingSoon;
+  document.getElementById('settingsCustomAgentLabel').textContent= S.settingsCustomAgent;
+  document.getElementById('settingsCustomAgentVal').textContent  = S.settingsComingSoon;
+  document.getElementById('settingsAgentColorLabel').textContent= S.settingsAgentColor;
+  document.getElementById('settingsAgentColorVal').textContent  = S.settingsComingSoon;
+  document.getElementById('settingsExportHistLabel').textContent= S.settingsExportHistory;
+  document.getElementById('settingsExportHistVal').textContent  = S.settingsComingSoon;
+  document.getElementById('settingsClearHistLabel').textContent = S.settingsClearHistory;
+  document.getElementById('settingsClearHistVal').textContent   = S.settingsComingSoon;
+
+  document.getElementById('langBtnIta').classList.toggle('active', lang === 'ita');
+  document.getElementById('langBtnEng').classList.toggle('active', lang === 'eng');
+
+  const critBody = document.getElementById('critBody');
+  if(critBody.classList.contains('empty')) critBody.textContent = S.waiting;
+  const synthBody = document.getElementById('synthBody');
+  if(synthBody.classList.contains('empty')) synthBody.textContent = S.waiting;
+
+  renderModes();
+  renderTiers();
+  renderAgents();
+  renderHistoryDrawer();
+}
+
+applyLang(currentLang);
 </script>
 </body>
 </html>
