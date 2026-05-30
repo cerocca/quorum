@@ -72,6 +72,7 @@ quorum/
 5. **Evidenzia rischi** prima di azioni distruttive (rm, override, ecc.)
 6. **Comandi pronti per Ubuntu Server + Docker** — niente astrazioni
 7. **Percorsi reali** — usa `~/quorum/`, `/etc/nginx/`, ecc.
+8. **Lingua repo: inglese** — tutti i file del repo (CHANGELOG.md, TODO.md, CLAUDE.md, SETUP.md, README.md, commit message) devono essere in inglese. Le conversazioni con claude.ai possono restare in italiano.
 
 ---
 

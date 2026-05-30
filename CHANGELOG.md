@@ -1,5 +1,18 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.4.6 — Run cost tracking
+*2026-05-30*
+
+- `callProxy()` now returns `{ text, cost }` instead of plain text; reads `usage.cost` from OpenRouter response (fallback to 0)
+- `sessionCost` accumulated across all phases (1, 2, 3, 4)
+- Total run cost displayed near the New decision / Export buttons after run completes; same visual style as reset/export buttons (non-clickable), aligned right via `justify-content: space-between`
+- `cost` column added to SQLite `history` table via `ALTER TABLE` with `PRAGMA table_info` guard (safe on existing DB)
+- Cost saved per session in both JSON data blob and dedicated column
+- Cost included in markdown export as `**Cost:**` field after `**Model:**`
+- Cost shown in history drawer entry metadata (monospace, fallback to empty if absent)
+- All repo files must be in English (CHANGELOG, TODO, CLAUDE.md, SETUP.md, commit messages)
+- Layout: max-width 1400px, side padding 32px
+
 ## v0.4.5 — Migrazione SQLite per history e favourites
 *2026-05-28*
 

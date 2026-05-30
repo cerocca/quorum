@@ -1,32 +1,33 @@
 # TODO.md — Quorum Decision Panel
 
-Legenda: `[ ]` aperto · `[x]` completato · `[~]` in corso · `[-]` scartato
+Legend: `[ ]` open · `[x]` done · `[~]` in progress · `[-]` discarded
 
 ---
 
-## v0.5 — Lingua, preferiti, agente custom
+## v0.5 — Language, favourites, custom agent
 
-- [ ] Agente custom: form in Settings > Agents — nome, bias, colore, system prompt. Appare come settima card selezionabile.
-- [ ] Agente custom: modello opzionale per-agente — override del modello globale per singolo agente (mix di modelli nella stessa run)
-- [ ] Bias per agente selezionabile dall'utente (toggle skeptic/advocate/investigative su ogni card) — valutare se aggiunge valore o confusione- [ ] Quick mode agent swap: deseleziona uno e selezionane un altro senza passare a Full → PRIMA CAPIRE COSA FA
-
+- [ ] Custom agent: form in Settings > Agents — name, bias, colour, system prompt. Appears as a seventh selectable card.
+- [ ] Custom agent: optional per-agent model — override the global model for a single agent (mix models in the same run)
+- [ ] Per-agent bias selectable by user (toggle skeptic/advocate/investigative on each card) — evaluate whether it adds value or confusion
+- [ ] Quick mode agent swap: deselect one and select another without switching to Full → UNDERSTAND BEHAVIOUR FIRST
 
 ---
 
-## Backlog / idee non schedulate
+## Backlog / unscheduled ideas
 
-- [ ] Confronto tra due decisioni in parallelo
-- [ ] Modalità "Devil's Panel" — tutti gli agenti con bias skeptic
-- [ ] Integrazione webhook (es. notifica Telegram al termine)
-- [ ] Supporto multi-utente (autenticazione base, fuori scope LAN-only per ora)
+- [ ] Compare two decisions in parallel
+- [ ] "Devil's Panel" mode — all agents with skeptic bias
+- [ ] Webhook integration (e.g. Telegram notification on run complete)
+- [ ] Multi-user support (basic auth, out of scope for LAN-only for now)
+- [ ] Company profile: multiple named profiles selectable per run (no auth required, single-user LAN)
 - [ ] Company profile: persistent context per user — requires authentication first
-- [ ] Solo mode: interroga un singolo agente, output semplificato senza verdetto — valutare impatto sull'identità del tool
+- [ ] Solo mode: query a single agent, simplified output without verdict — evaluate impact on tool identity
 
 ---
 
-## Scartati
+## Discarded
 
-- [-] Gating automatico agenti (tier deciso manualmente dall'utente)
-- [-] Team lead gerarchici (troppo overkill)
-- [-] Export PPTX/DOCX (non prioritario)
-- [-] Supporto provider LLM multipli (solo OpenRouter)
+- [-] Automatic agent gating (tier decided manually by user)
+- [-] Hierarchical team leads (too much overkill)
+- [-] PPTX/DOCX export (not a priority)
+- [-] Multiple LLM provider support (OpenRouter only)
