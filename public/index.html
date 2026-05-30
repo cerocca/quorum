@@ -39,6 +39,18 @@
   --shadow-md:0 1px 2px rgba(17,17,17,.04), 0 4px 12px -2px rgba(17,17,17,.06), 0 0 0 1px rgba(17,17,17,.04);
   --shadow-lg:0 1px 2px rgba(17,17,17,.04), 0 12px 32px -8px rgba(17,17,17,.10), 0 0 0 1px rgba(17,17,17,.05);
 }
+[data-theme="dark"]{
+  --bg:#0f1419;
+  --surface:#1a2130;
+  --surface-tint:#222d3d;
+  --text:#dce8f0;
+  --text-soft:#8fa8c0;
+  --muted:#607080;
+  --border:#2a3848;
+}
+[data-theme="dark"] .run-btn{background:#dce8f0;color:#0f1419}
+[data-theme="dark"] .lang-btn.active{background:#dce8f0;color:#0f1419;border-color:#dce8f0}
+[data-theme="dark"] .agent-card.active{border-color:#dce8f0;box-shadow:0 0 0 1px #dce8f0}
 html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
 
 .app{max-width:1400px;margin:0 auto;padding:32px 32px 80px 32px}
@@ -222,13 +234,32 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 .settings-section-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:10px}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft)}
 .settings-row:last-child{border-bottom:none}
-.settings-row-label{font-size:13px;color:var(--text)}
+.settings-row-label{font-family:system-ui,sans-serif;font-size:13px;color:var(--text)}
 .settings-row-value.placeholder{font-family:var(--mono);font-size:11px;color:var(--muted-2)}
 
 /* Language toggle */
 .lang-toggle{display:flex;gap:4px}
-.lang-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .15s}
+.lang-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:system-ui,sans-serif;font-size:11px;padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .15s}
 .lang-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* Settings tabs */
+.settings-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.settings-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--mono);font-size:10px;padding:10px 14px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:-1px}
+.settings-tab:hover{color:var(--text)}
+.settings-tab.active{color:var(--text);border-bottom-color:var(--text)}
+.settings-tab-panel{display:none}
+.settings-tab-panel.active{display:block}
+.settings-soon{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-align:center;padding:32px 16px}
+
+/* Drawer footer */
+.drawer-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.drawer-user{display:flex;align-items:center;gap:8px}
+.avatar-circle{width:26px;height:26px;border-radius:50%;background:var(--text);color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.drawer-username{font-family:var(--mono);font-size:11px;color:var(--text-soft)}
+
+/* Page footer */
+.page-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding:10px 0;margin-top:32px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.page-footer-left,.page-footer-right{display:flex;align-items:center;gap:6px}
 
 @media(max-width:600px){
   html,body{overflow-x:hidden;max-width:100%}
@@ -356,6 +387,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     </div>
   </div>
 
+  <footer class="page-footer">
+    <div class="page-footer-left">
+      <div class="avatar-circle">CI</div>
+      <span>ciru</span>
+    </div>
+    <div class="page-footer-right">
+      <a href="https://github.com/cerocca/quorum" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>v0.4.7</span></a>
+    </div>
+  </footer>
+
 </div>
 
 <!-- History overlay + drawer -->
@@ -379,47 +420,60 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
     <span class="drawer-title" id="settingsDrawerTitle">Settings</span>
     <button class="drawer-close" onclick="closeSettings()">×</button>
   </div>
+  <div class="settings-tabs">
+    <button class="settings-tab active" id="stab-prefs" onclick="switchSettingsTab('prefs')">Prefs</button>
+    <button class="settings-tab" id="stab-profiles" onclick="switchSettingsTab('profiles')">Profiles</button>
+    <button class="settings-tab" id="stab-agents" onclick="switchSettingsTab('agents')">Agents</button>
+    <button class="settings-tab" id="stab-admin" onclick="switchSettingsTab('admin')">Admin</button>
+  </div>
   <div class="drawer-body">
-
-    <div class="settings-section">
-      <div class="settings-section-label" id="settingsPrefsLabel">Preferences</div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsLangLabel">Language</span>
-        <div class="lang-toggle">
-          <button class="lang-btn" id="langBtnIta" onclick="applyLang('ita')">ITA</button>
-          <button class="lang-btn" id="langBtnEng" onclick="applyLang('eng')">ENG</button>
+    <div class="settings-tab-panel active" id="stab-panel-prefs">
+      <div class="settings-section">
+        <div class="settings-section-label" id="settingsPrefsLabel">Preferences</div>
+        <div class="settings-row">
+          <span class="settings-row-label" id="settingsLangLabel">Language</span>
+          <div class="lang-toggle">
+            <button class="lang-btn" id="langBtnIta" onclick="applyLang('ita')">ITA</button>
+            <button class="lang-btn" id="langBtnEng" onclick="applyLang('eng')">ENG</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Theme</span>
+          <div class="lang-toggle">
+            <button class="lang-btn" id="themeBtnLight" onclick="applyTheme('light')">Light</button>
+            <button class="lang-btn" id="themeBtnDark" onclick="applyTheme('dark')">Dark</button>
+          </div>
         </div>
       </div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsModelFavsLabel">Model favourites</span>
-        <span class="settings-row-value placeholder" id="settingsModelFavsVal">Coming soon</span>
-      </div>
     </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label" id="settingsAgentsLabel">Agents</div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsCustomAgentLabel">Custom agent</span>
-        <span class="settings-row-value placeholder" id="settingsCustomAgentVal">Coming soon</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsAgentColorLabel">Agent tag colour</span>
-        <span class="settings-row-value placeholder" id="settingsAgentColorVal">Coming soon</span>
-      </div>
+    <div class="settings-tab-panel" id="stab-panel-profiles">
+      <div class="settings-soon">Coming soon</div>
     </div>
-
-    <div class="settings-section">
-      <div class="settings-section-label" id="settingsDataLabel">Data</div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsExportHistLabel">Export history</span>
-        <span class="settings-row-value placeholder" id="settingsExportHistVal">Coming soon</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-row-label" id="settingsClearHistLabel">Clear all history</span>
-        <span class="settings-row-value placeholder" id="settingsClearHistVal">Coming soon</span>
-      </div>
+    <div class="settings-tab-panel" id="stab-panel-agents">
+      <div class="settings-soon">Coming soon</div>
     </div>
-
+    <div class="settings-tab-panel" id="stab-panel-admin">
+      <div class="settings-soon">Coming soon</div>
+    </div>
+    <!-- Hidden IDs preserved for applyLang() -->
+    <span id="settingsAgentsLabel" style="display:none"></span>
+    <span id="settingsDataLabel" style="display:none"></span>
+    <span id="settingsModelFavsLabel" style="display:none"></span>
+    <span id="settingsModelFavsVal" style="display:none"></span>
+    <span id="settingsCustomAgentLabel" style="display:none"></span>
+    <span id="settingsCustomAgentVal" style="display:none"></span>
+    <span id="settingsAgentColorLabel" style="display:none"></span>
+    <span id="settingsAgentColorVal" style="display:none"></span>
+    <span id="settingsExportHistLabel" style="display:none"></span>
+    <span id="settingsExportHistVal" style="display:none"></span>
+    <span id="settingsClearHistLabel" style="display:none"></span>
+    <span id="settingsClearHistVal" style="display:none"></span>
+  </div>
+  <div class="drawer-footer">
+    <div class="drawer-user">
+      <div class="avatar-circle">CI</div>
+      <span class="drawer-username">ciru</span>
+    </div>
   </div>
 </div>
 
@@ -1279,6 +1333,13 @@ function exportSession(){
 function openSettings(){ document.getElementById('settingsDrawer').classList.add('open'); document.getElementById('settingsOverlay').classList.add('open'); }
 function closeSettings(){ document.getElementById('settingsDrawer').classList.remove('open'); document.getElementById('settingsOverlay').classList.remove('open'); }
 
+function switchSettingsTab(tabId){
+  document.querySelectorAll('.settings-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.settings-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('stab-'+tabId).classList.add('active');
+  document.getElementById('stab-panel-'+tabId).classList.add('active');
+}
+
 // ── Language ──────────────────────────────────────────────
 function applyLang(lang){
   currentLang = lang;
@@ -1364,6 +1425,16 @@ async function migrateFromLocalStorage(){
   }
   renderHistoryDrawer();
 }
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('quorum-theme', theme);
+  document.getElementById('themeBtnLight').classList.toggle('active', theme === 'light');
+  document.getElementById('themeBtnDark').classList.toggle('active', theme === 'dark');
+}
+
+const savedTheme = localStorage.getItem('quorum-theme') || 'light';
+applyTheme(savedTheme);
 
 applyLang(currentLang);
 migrateFromLocalStorage();

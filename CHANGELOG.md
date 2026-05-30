@@ -1,5 +1,18 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.4.7 — Settings drawer with tabs + page footer
+*2026-05-30*
+
+- Settings drawer replaced with tabbed version: Prefs, Profiles, Agents, Admin
+- Prefs tab: language toggle and light/dark theme toggle
+- Dark theme implemented (Slate dark palette, toggled via `data-theme="dark"` on `<html>`)
+- Profiles / Agents / Admin tabs: scaffold with "Coming soon" placeholder
+- User footer added to Settings drawer (avatar circle + username, placeholder for v0.4.8)
+- Page footer added: avatar + username left, GitHub icon + version right
+- Page footer font-size 11px; GitHub icon links to https://github.com/cerocca/quorum
+- Settings drawer font fixed: system-ui instead of Syne on row labels and toggle buttons
+- Layout max-width 1400px, side padding 32px (landed in v0.4.6 session, documented here)
+
 ## v0.4.6 — Run cost tracking
 *2026-05-30*
 
