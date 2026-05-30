@@ -1,144 +1,124 @@
-# CLAUDE.md — Quorum Decision Panel
+# CLAUDE.md — Quorum
 
-## Cos'è Quorum
-Webapp multi-agent per la valutazione di decisioni complesse.
+## What is Quorum
+Multi-agent web app for evaluating complex decisions.
 Pipeline: agent analysis → cross-critique → synthesis → pre-mortem.
-Provider LLM: OpenRouter (unico, nessun supporto Anthropic diretto).
-Deploy target: Sibilla (Ubuntu Server, Docker, LAN-only).
+LLM provider: OpenRouter (only — no direct Anthropic support).
+Deploy target: self-hosted server, Docker, typically LAN-only.
 
 ---
 
-## Ruoli nel workflow
+## Workflow roles
 
 ### claude.ai (prompt engineer)
-- Architettura e decisioni di design
-- Scrittura di prompt precisi e completi per Claude Code
-- Aggiornamento dei file `.md` di progetto
-- Review dei risultati e iterazione
+- Architecture and design decisions
+- Writing precise prompts for Claude Code
+- Updating project .md files
+- Reviewing results and iterating
 
-### Claude Code (Sibilla — esecutore)
-- Scrittura e modifica di file reali nel repo
-- Gestione git (commit, branch, push)
-- Build e gestione container Docker
-- Test locali su Sibilla
+### Claude Code (executor)
+- Writing and editing files in the repo
+- Git management (commit, branch, push)
+- Docker build and container management
+- Local testing on the server
 
-**Regola**: Claude Code non decide l'architettura. Esegue istruzioni precise ricevute da claude.ai. Se un'istruzione è ambigua, chiede prima di procedere.
+**Rule**: Claude Code does not decide architecture. It executes precise instructions from claude.ai. If an instruction is ambiguous, it asks before proceeding.
 
 ---
 
-## Struttura del repo
-
-```
+## Repo structure
 quorum/
-├── CLAUDE.md          ← questo file
-├── CHANGELOG.md       ← storia delle versioni
-├── SETUP.md           ← istruzioni di installazione e configurazione
-├── TODO.md            ← task aperti e backlog
-├── .env               ← OR_KEY, DEFAULT_MODEL (non committare)
-├── .env.example       ← template pubblico
+├── CLAUDE.md          ← this file
+├── CHANGELOG.md       ← version history
+├── SETUP.md           ← installation and configuration
+├── TODO.md            ← open tasks and backlog
+├── README.md          ← public-facing project description
+├── LICENSE            ← MIT
+├── .env               ← secrets (never commit)
+├── .env.example       ← public template
 ├── .gitignore
-├── server.js          ← proxy Express: /api/chat, /api/models → OpenRouter
+├── server.js          ← Express proxy: /api/* → OpenRouter + auth + SQLite
 ├── Dockerfile
 ├── docker-compose.yml
-├── data/              ← volume SQLite (non committare quorum.db)
-│   └── quorum.db      ← generato a runtime, in .gitignore
+├── package.json
+├── data/              ← SQLite volume (gitignored)
+│   ├── quorum.db      ← main database
+│   └── sessions       ← session store
 └── public/
-    ├── index.html     ← frontend single-file
-    ├── login.html     ← login page
-    └── fonts/         ← local font files (not committed — downloaded at deploy time)
-```
+    ├── index.html     ← main single-file frontend
+    └── login.html     ← login page
 
 ---
 
-## Stack tecnico
+## Tech stack
 
-| Componente | Scelta |
+| Component | Choice |
 |---|---|
-| Frontend | Single-file HTML/CSS/JS in `public/` |
-| Backend | Node.js + Express (proxy OpenRouter) |
-| LLM provider | OpenRouter (unico) |
-| Database | SQLite via better-sqlite3, file `/app/data/quorum.db` |
+| Frontend | Single-file HTML/CSS/JS in public/ |
+| Backend | Node.js + Express |
+| Auth | express-session + connect-sqlite3 + bcrypt |
+| Database | SQLite via better-sqlite3 at /app/data/quorum.db |
+| LLM provider | OpenRouter (single provider) |
 | Container | Docker + docker-compose |
-| Porta | 3003 (verificare conflitti su Sibilla) |
-| Restart policy | `unless-stopped` |
-| Config | `.env` con `OR_KEY` e `DEFAULT_MODEL` |
+| Port | 3003 |
+| Restart policy | unless-stopped |
+| Fonts | Google Fonts (Syne + IBM Plex Mono) |
 
 ---
 
-## Regole operative per Claude Code
+## Claude Code operating rules
 
-1. **Tocca solo i file necessari** — niente refactor non richiesti
-2. **Modifiche minime e sicure** — backward compatibility sempre
-3. **Mostra diff o file completo** prima di applicare modifiche a file esistenti
-4. **Non committare `.env`** — solo `.env.example`
-5. **Evidenzia rischi** prima di azioni distruttive (rm, override, ecc.)
-6. **Comandi pronti per Ubuntu Server + Docker** — niente astrazioni
-7. **Percorsi reali** — usa `~/quorum/`, `/etc/nginx/`, ecc.
-8. **Lingua repo: inglese** — tutti i file del repo (CHANGELOG.md, TODO.md, CLAUDE.md, SETUP.md, README.md, commit message) devono essere in inglese. Le conversazioni con claude.ai possono restare in italiano.
-
----
-
-## Processo di chiusura sessione (pre-commit)
-
-Per chiusura sessione si intende: **test manuali passati, tutto funzionante**.
-Solo a quel punto Claude Code deve:
-
-1. Aggiornare `CHANGELOG.md` con le modifiche della sessione
-2. Aggiornare `TODO.md` — segnare completati, aggiungere nuovi emersi
-3. Aggiornare `SETUP.md` se sono cambiate istruzioni di setup/config
-4. Aggiornare `CLAUDE.md` se sono cambiate architettura o convenzioni
-5. **Fermarsi qui.** Il commit finale (`git add`, `git commit`, `git push`) lo esegue sempre l'utente da terminale.
-
-**Commit message format**: `v{X.Y.Z} — descrizione breve in italiano`
-Esempio: `v0.4.5 — migrazione SQLite per history e favourites`
+1. **Touch only necessary files** — no unrequested refactoring
+2. **Minimal, safe changes** — backward compatibility always
+3. **Show diff or full file** before applying changes to existing files
+4. **Never commit .env** — only .env.example
+5. **Flag risks** before destructive actions (rm, override, etc.)
+6. **Ubuntu Server + Docker ready commands** — no abstractions
+7. **Real paths** — use ~/quorum/, /app/data/, etc.
+8. **Repo language: English** — all repo files (CHANGELOG, TODO, CLAUDE.md, SETUP.md, README.md, commit messages) must be in English. Conversations with claude.ai may be in Italian.
 
 ---
 
-## Variabili d'ambiente
+## Session close process (pre-commit)
 
-```env
-OR_KEY=sk-or-...          # API key OpenRouter
-DEFAULT_MODEL=google/gemini-2.5-flash-preview-05-20
+Session close means: manual tests passed, everything working.
+Only then Claude Code should:
+
+1. Update CHANGELOG.md with session changes
+2. Update TODO.md — mark completed, add newly emerged tasks
+3. Update SETUP.md if setup/config instructions changed
+4. Update CLAUDE.md if architecture or conventions changed
+5. **Stop here.** The final commit (git add, git commit, git push) is always run by the user from the terminal.
+
+**Commit message format**: v{X.Y.Z} — short description in English
+Example: v0.4.8 — auth, profiles, login page, local fonts, admin password reset
+
+---
+
+## Environment variables
+
+OR_KEY=sk-or-...               # OpenRouter API key
+SESSION_SECRET=...             # Session signing secret
+ADMIN_USER=admin               # Initial admin username (seed, one-shot)
+ADMIN_PASS=changeme            # Initial admin password (seed, one-shot)
+DEFAULT_MODEL=                 # Server-side model fallback
 PORT=3003
-SESSION_SECRET=change-me-in-production
-ADMIN_USER=admin
-ADMIN_PASS=changeme
-```
-
-`DEFAULT_MODEL` è il fallback lato server se il client non specifica un modello.
-Il modello è selezionabile dalla UI — la selezione ha sempre precedenza.
 
 ---
 
-## Comandi utili
+## Useful commands
 
 ```bash
-# Build e avvio
 cd ~/quorum
-docker compose up -d --build
-
-# Log
-docker compose logs -f
-
-# Stop
-docker compose down
-
-# Verifica porta
-ss -tlnp | grep 3003
+docker compose up -d --build   # build and start
+docker compose logs -f         # follow logs
+docker compose down            # stop
+ss -tlnp | grep 3003           # verify port
 ```
 
 ---
 
-## Versioni
+## Current version
 
-Vedi `CHANGELOG.md` per la storia completa.
-Versione corrente: **v0.4.8** — Auth + Profiles.
-
----
-
-## Note Sibilla
-
-- Hardware: Intel Core i3-6100T, 8GB RAM, 256GB SSD, no GPU
-- Docker installato, altri container attivi — verificare conflitti di porta
-- LAN-only: nessuna esposizione esterna necessaria
-- OpenRouter: outbound port 443 sufficiente
+v0.4.8 — Auth + Profiles
+See CHANGELOG.md for full history.
