@@ -400,6 +400,72 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 </div>
 
+<!-- Agent form modal -->
+<div id="agentModalOverlay" onclick="closeAgentForm()" style="display:none;position:fixed;inset:0;background:rgba(17,17,17,.5);z-index:400;align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;width:100%;max-width:560px;max-height:calc(100vh - 80px);overflow-y:auto;box-shadow:var(--shadow-lg);padding:24px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <span id="agentModalTitle" style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.06em">New agent</span>
+      <button onclick="closeAgentForm()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;line-height:1;padding:0 4px">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Name (EN)</label>
+        <input class="model-input" id="agentFormNameEn" placeholder="Name in English" style="width:100%"/>
+      </div>
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Name (ITA)</label>
+        <input class="model-input" id="agentFormNameIta" placeholder="Nome in italiano" style="width:100%"/>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Description (EN)</label>
+        <textarea class="model-input" id="agentFormDescEn" placeholder="Short description" style="width:100%;min-height:60px;resize:vertical;font-size:12px;line-height:1.5;font-family:system-ui,sans-serif"></textarea>
+      </div>
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Description (ITA)</label>
+        <textarea class="model-input" id="agentFormDescIta" placeholder="Descrizione breve" style="width:100%;min-height:60px;resize:vertical;font-size:12px;line-height:1.5;font-family:system-ui,sans-serif"></textarea>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:12px;align-items:end">
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Bias</label>
+        <select class="model-input" id="agentFormBias" style="width:100%">
+          <option value="contrarian">contrarian</option>
+          <option value="risk-first">risk-first</option>
+          <option value="feasibility">feasibility</option>
+          <option value="opportunity">opportunity</option>
+          <option value="horizon">horizon</option>
+          <option value="harm-aware">harm-aware</option>
+          <option value="empirical">empirical</option>
+          <option value="custom">custom</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Color</label>
+        <input type="color" id="agentFormColor" value="#888888" style="width:52px;height:37px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--surface);padding:3px"/>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Model override (optional — leave empty to use global model)</label>
+      <input class="model-input" id="agentFormModelInput" list="agentFormModelList" placeholder="e.g. google/gemini-2.5-flash-preview" autocomplete="off" style="width:100%"/>
+      <datalist id="agentFormModelList"></datalist>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">System prompt (EN) *</label>
+      <textarea class="model-input" id="agentFormSystemEn" placeholder="System prompt in English" style="width:100%;min-height:120px;resize:vertical;font-size:12px;line-height:1.5;font-family:var(--mono)"></textarea>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">System prompt (ITA)</label>
+      <textarea class="model-input" id="agentFormSystemIta" placeholder="System prompt in italiano" style="width:100%;min-height:120px;resize:vertical;font-size:12px;line-height:1.5;font-family:var(--mono)"></textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="run-btn" onclick="saveAgentForm()" style="width:auto;padding:9px 18px;margin-bottom:0">Save</button>
+      <button class="reset-btn" onclick="closeAgentForm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- History overlay + drawer -->
 <div class="hist-overlay" id="histOverlay" onclick="closeDrawer()"></div>
 <div class="hist-drawer" id="histDrawer">
@@ -601,12 +667,14 @@ let activeProfile = null;
 
 // ── Bias chips ────────────────────────────────────────────
 const BIAS_CHIP = {
-  'contrarian':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
-  'risk-first':  {bg:'var(--chip-investigative-bg)', tx:'var(--chip-investigative-tx)'},
-  'feasibility': {bg:'var(--chip-investigative-bg)', tx:'var(--chip-investigative-tx)'},
-  'opportunity': {bg:'var(--chip-advocate-bg)',      tx:'var(--chip-advocate-tx)'},
-  'horizon':     {bg:'var(--chip-advocate-bg)',      tx:'var(--chip-advocate-tx)'},
-  'harm-aware':  {bg:'var(--chip-skeptic-bg)',       tx:'var(--chip-skeptic-tx)'},
+  'contrarian':  {bg:'#fde6e6', tx:'#a51d1d'},
+  'risk-first':  {bg:'#fdeede', tx:'#a54a1d'},
+  'feasibility': {bg:'#e2efff', tx:'#1e4b85'},
+  'opportunity': {bg:'#fafde6', tx:'#7a7a00'},
+  'horizon':     {bg:'#f0e6ff', tx:'#6b1da5'},
+  'harm-aware':  {bg:'#e6fdf4', tx:'#1a7a4a'},
+  'empirical':   {bg:'#ffe6f4', tx:'#a51d6b'},
+  'custom':      {bg:'#f0f0f0', tx:'#666666'},
 };
 
 // ── Agents ────────────────────────────────────────────────
@@ -712,6 +780,8 @@ let selectedTier    = 'full';
 let allModels       = [];
 let historyCache    = [];
 let favouritesCache = [];
+let customAgents    = [];
+let editingAgentId  = null;
 
 // ── Favourites ────────────────────────────────────────────
 function loadFavourites(){ return favouritesCache; }
@@ -838,15 +908,18 @@ function renderAgents(){
   const S = STRINGS[currentLang];
   const maxAgents = selectedTier === 'quick' ? 3 : 5;
   const minAgents = selectedTier === 'quick' ? 2 : 3;
-  document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>{
-    const active  = selectedAgents.has(a.id);
-    const locked  = !active && selectedAgents.size >= maxAgents;
-    const chip    = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
-    const aName   = currentLang === 'ita' ? a.name_ita : a.name;
-    const aDesc   = currentLang === 'ita' ? a.desc_ita : a.desc;
+  const allAgents = [...AGENTS, ...customAgents];
+  document.getElementById('agentsGrid').innerHTML = allAgents.map(a=>{
+    const active   = selectedAgents.has(a.id);
+    const locked   = !active && selectedAgents.size >= maxAgents;
+    const chip     = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
+    const aName    = currentLang === 'ita' ? (a.name_ita || a.name) : a.name;
+    const aDesc    = currentLang === 'ita' ? (a.desc_ita || a.desc) : a.desc;
+    const isCustom = a.id && a.id.startsWith('custom-');
     return `<div class="agent-card ${active?'active':''} ${locked?'locked':''}" onclick="toggleAgent('${a.id}')">
+      ${isCustom ? '<span style="position:absolute;top:7px;left:9px;font-size:9px;color:var(--muted);pointer-events:none">✎</span>' : ''}
       <div class="agent-check">${active?'✓':''}</div>
-      <div class="agent-name" style="color:var(--text)">${aName}</div>
+      <div class="agent-name" style="color:var(--text)${isCustom?';padding-left:12px':''}">${aName}</div>
       <div class="agent-desc">${aDesc}</div>
       <span class="bias-chip" style="background:${chip.bg};color:${chip.tx}">${a.bias}</span>
     </div>`;
@@ -877,11 +950,11 @@ function toggleCard(cardId){
 }
 
 // ── API proxy calls ───────────────────────────────────────
-async function callProxy(messages, max_tokens){
+async function callProxy(messages, max_tokens, model){
   const r = await fetch('/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({model: selectedModel, max_tokens, messages})
+    body: JSON.stringify({model: model || selectedModel, max_tokens, messages})
   });
   const d = await r.json();
   if(d.error) throw new Error(d.error.message||'API error');
@@ -913,7 +986,7 @@ async function runPanel(){
   window.scrollBy({top:200,behavior:'smooth'});
 
   let sessionCost = 0;
-  const agents = AGENTS.filter(a => selectedAgents.has(a.id));
+  const agents = [...AGENTS, ...customAgents].filter(a => selectedAgents.has(a.id));
   const context = document.getElementById('contextInput').value.trim();
   const decisionBlock = `Decision: ${decision}${context?'\n\nContext: '+context:''}`;
 
@@ -942,12 +1015,13 @@ async function runPanel(){
   // Phase 1 — parallel
   const results = {};
   await Promise.all(agents.map(async a=>{
-    const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
+    const agentSystem = currentLang === 'ita' ? (a.system_ita || a.system) : a.system;
+    const agentModel  = a.model_override || null;
     try{
       const {text, cost} = await callProxy([
         {role:'system', content: injectProfile(agentSystem)},
         {role:'user',   content: decisionBlock}
-      ], 1200);
+      ], 1200, agentModel);
       sessionCost += cost;
       results[a.id] = text;
       document.getElementById(`ab-${a.id}`).textContent = text;
@@ -1066,12 +1140,13 @@ async function runPanel(){
   }).join('');
 
   await Promise.all(agents.map(async a=>{
-    const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
+    const agentSystem = currentLang === 'ita' ? (a.system_ita || a.system) : a.system;
+    const agentModel  = a.model_override || null;
     try{
       const {text, cost} = await callProxy([
         {role:'system', content: injectProfile(agentSystem)},
         {role:'user',   content: S.premortPrompt(a.name, a.bias, decisionBlock)}
-      ], 1200);
+      ], 1200, agentModel);
       sessionCost += cost;
       pmResults[a.id] = text;
       document.getElementById(`pb-${a.id}`).textContent = text;
@@ -1344,7 +1419,8 @@ function switchSettingsTab(tabId){
   document.getElementById('stab-'+tabId).classList.add('active');
   document.getElementById('stab-panel-'+tabId).classList.add('active');
   if(tabId === 'profiles') renderProfilesTab();
-  if(tabId === 'admin') renderAdminTab();
+  if(tabId === 'agents')   renderAgentsTab();
+  if(tabId === 'admin')    renderAdminTab();
 }
 
 // ── Auth ──────────────────────────────────────────────────
@@ -1704,6 +1780,194 @@ async function createUser() {
   }
 }
 
+// ── Custom agents ─────────────────────────────────────────
+async function loadCustomAgents() {
+  try {
+    const r = await fetch('/api/agents');
+    const rows = await r.json();
+    customAgents = rows.map(a => ({ ...a, id: `custom-${a.id}` }));
+  } catch { customAgents = []; }
+}
+
+async function renderAgentsTab() {
+  const panel = document.getElementById('stab-panel-agents');
+  panel.innerHTML = '<div class="settings-soon">Loading…</div>';
+  await loadCustomAgents();
+  renderAgents();
+  const isAdmin = currentUser?.isAdmin;
+  const hdr = 'font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-soft);user-select:none';
+  let html = '<div style="padding-bottom:4px">';
+
+  // Section 1: Custom agents
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Custom agents</span><span class="sec-chevron">▼</span></div><div style="padding:4px 0 12px">`;
+  if (customAgents.length === 0) {
+    html += '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:8px 0 10px">No custom agents yet.</div>';
+  } else {
+    customAgents.forEach(a => {
+      const chip = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-soft)">
+        <span style="font-family:var(--sans);font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(a.name)}</span>
+        <span class="bias-chip" style="background:${chip.bg};color:${chip.tx}">${a.bias}</span>
+        ${isAdmin ? `<button onclick="openAgentForm('${a.id}')" title="Edit" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px;flex-shrink:0">✎</button>
+        <button onclick="deleteCustomAgent('${a.id}')" title="Delete" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px;flex-shrink:0">✕</button>` : ''}
+      </div>`;
+    });
+  }
+  if (isAdmin) html += '<button class="reset-btn" onclick="openAgentForm()" style="margin-top:12px">+ New agent</button>';
+  html += '</div>';
+
+  // Section 2: Built-in agents (collapsed)
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Built-in agents</span><span class="sec-chevron">▶</span></div><div style="display:none;padding:4px 0 12px">`;
+  AGENTS.forEach(a => {
+    const chip = BIAS_CHIP[a.bias] || {bg:'var(--surface-tint)', tx:'var(--text-soft)'};
+    const aName = currentLang === 'ita' ? a.name_ita : a.name;
+    const aDesc = currentLang === 'ita' ? a.desc_ita : a.desc;
+    const aSys  = currentLang === 'ita' ? a.system_ita : a.system;
+    html += `<div style="border-bottom:1px solid var(--border-soft)">
+      <div onclick="toggleBuiltinAgent(this)" style="display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;user-select:none">
+        <span style="font-family:var(--sans);font-size:12px;font-weight:600;flex:1">${escHtml(aName)}</span>
+        <span class="bias-chip" style="background:${chip.bg};color:${chip.tx}">${a.bias}</span>
+        <span style="font-size:10px;color:var(--muted)">▶</span>
+      </div>
+      <div style="display:none;padding:0 0 10px">
+        <div style="font-family:system-ui,sans-serif;font-size:12px;color:var(--text-soft);margin-bottom:8px;line-height:1.5">${escHtml(aDesc)}</div>
+        <pre style="background:var(--surface-tint);border:1px solid var(--border);border-radius:4px;padding:10px;font-family:var(--mono);font-size:10px;white-space:pre-wrap;line-height:1.5;color:var(--text-soft);overflow-x:auto;margin:0">${escHtml(aSys)}</pre>
+      </div>
+    </div>`;
+  });
+  html += '<button class="reset-btn" onclick="exportAllPrompts()" style="margin-top:12px">↓ Export all prompts</button>';
+  html += '</div>';
+
+  // Section 3: Prompt writing guide (collapsed)
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Prompt writing guide</span><span class="sec-chevron">▶</span></div>
+  <div style="display:none;padding:10px 0 12px;font-family:system-ui,sans-serif;font-size:13px;color:var(--text-soft);line-height:1.6">
+    <p style="margin-bottom:8px"><strong>1. Declare a bias.</strong> Every agent should open with a declared stance — skeptic, advocate, investigative. This makes disagreement structural, not accidental.</p>
+    <p style="margin-bottom:8px"><strong>2. Fix the output format.</strong> Define the exact structure: a position sentence, then 3 bullet points max. Unconstrained agents write essays that are hard to compare.</p>
+    <p style="margin-bottom:8px"><strong>3. Be brief.</strong> The best system prompts are 3–5 sentences. If you need more, the role is too complex — split it into two agents.</p>
+    <p style="margin-bottom:12px"><strong>4. Adversarial vs. advocate.</strong> Adversarial agents argue against the decision. Advocate agents argue for it. Mixed signals produce mush — choose a side.</p>
+    <button class="reset-btn" onclick="downloadGuide()">↓ Download guide</button>
+  </div>`;
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function toggleBuiltinAgent(el) {
+  const body = el.nextElementSibling;
+  const chevron = el.querySelector('span:last-child');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  chevron.textContent = collapsed ? '▼' : '▶';
+}
+
+function exportAllPrompts() {
+  const lines = ['# Quorum — Built-in Agent Prompts', ''];
+  AGENTS.forEach(a => {
+    lines.push(`## ${a.name} / ${a.name_ita}`, '', `**Bias:** ${a.bias}`, '');
+    lines.push('### System prompt (EN)', '', a.system, '');
+    lines.push('### System prompt (ITA)', '', a.system_ita, '', '---', '');
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/markdown'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'quorum-std-agent-prompts.md'; link.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadGuide() {
+  const lines = [
+    '# Quorum — Prompt Writing Guide', '',
+    'How to write system prompts for custom Quorum agents.', '',
+    '## 1. Declare a bias',
+    "Every agent should open with a declared stance — skeptic, advocate, investigative.",
+    "This makes disagreement structural, not accidental.", '',
+    "Example: \"You are a Devil's Advocate with a skeptic bias.\"", '',
+    '## 2. Fix the output format',
+    'Define the exact structure: a position sentence, then 3 bullet points max.',
+    'Unconstrained agents write essays that are hard to compare.', '',
+    '## 3. Be brief',
+    'The best system prompts are 3–5 sentences.',
+    'If you need more, the role is too complex — split it into two agents.', '',
+    '## 4. Adversarial vs. advocate',
+    'Adversarial agents argue against the decision.',
+    'Advocate agents argue for it.',
+    'Mixed signals produce mush — choose a side.', '',
+    '---', '', '## Built-in agent examples', '',
+  ];
+  AGENTS.forEach(a => {
+    lines.push(`### ${a.name} (bias: ${a.bias})`, '', '```', a.system, '```', '');
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/markdown'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'quorum-prompt-guide.md'; link.click();
+  URL.revokeObjectURL(url);
+}
+
+function openAgentForm(id) {
+  editingAgentId = id || null;
+  document.getElementById('agentModalTitle').textContent = editingAgentId ? 'Edit agent' : 'New agent';
+  const a = editingAgentId ? customAgents.find(x => x.id === editingAgentId) : null;
+  document.getElementById('agentFormNameEn').value     = a?.name           || '';
+  document.getElementById('agentFormNameIta').value    = a?.name_ita       || '';
+  document.getElementById('agentFormDescEn').value     = a?.desc           || '';
+  document.getElementById('agentFormDescIta').value    = a?.desc_ita       || '';
+  document.getElementById('agentFormBias').value       = a?.bias           || 'custom';
+  document.getElementById('agentFormColor').value      = a?.color          || '#888888';
+  document.getElementById('agentFormModelInput').value = a?.model_override || '';
+  document.getElementById('agentFormSystemEn').value   = a?.system         || '';
+  document.getElementById('agentFormSystemIta').value  = a?.system_ita     || '';
+  const dl = document.getElementById('agentFormModelList');
+  if (dl) dl.innerHTML = allModels.map(m => `<option value="${escHtml(m.id)}">`).join('');
+  document.getElementById('agentModalOverlay').style.display = 'flex';
+}
+
+function closeAgentForm() {
+  editingAgentId = null;
+  document.getElementById('agentModalOverlay').style.display = 'none';
+}
+
+async function saveAgentForm() {
+  console.log('saveAgentForm called, editingAgentId:', editingAgentId);
+  const name         = document.getElementById('agentFormNameEn').value.trim();
+  const name_ita     = document.getElementById('agentFormNameIta').value.trim();
+  const desc         = document.getElementById('agentFormDescEn').value.trim();
+  const desc_ita     = document.getElementById('agentFormDescIta').value.trim();
+  const bias         = document.getElementById('agentFormBias').value;
+  const color        = document.getElementById('agentFormColor').value;
+  const model_override = document.getElementById('agentFormModelInput').value.trim() || null;
+  const system       = document.getElementById('agentFormSystemEn').value.trim();
+  const system_ita   = document.getElementById('agentFormSystemIta').value.trim();
+  if (!name || !system) { console.log('saveAgentForm: guard triggered — name:', name, 'system:', system); return; }
+  const agent = { name, name_ita, desc, desc_ita, bias, color, model_override, system, system_ita };
+  if (editingAgentId) {
+    agent.id = editingAgentId;
+    const numericId = editingAgentId.replace(/^custom-/, '');
+    const url = `/api/agents/${numericId}`;
+    console.log('method:', 'PUT', 'url:', url, 'body:', JSON.stringify(agent));
+    await fetch(url, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(agent) });
+  } else {
+    agent.id = `custom-${Date.now()}`;
+    const url = '/api/agents';
+    console.log('method:', 'POST', 'url:', url, 'body:', JSON.stringify(agent));
+    await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(agent) });
+  }
+  closeAgentForm();
+  await loadCustomAgents();
+  renderAgents();
+  renderAgentsTab();
+}
+
+async function deleteCustomAgent(id) {
+  if (!confirm('Delete this custom agent?')) return;
+  const numericId = id.replace(/^custom-/, '');
+  await fetch(`/api/agents/${numericId}`, { method:'DELETE' });
+  selectedAgents.delete(id);
+  await loadCustomAgents();
+  renderAgents();
+  renderAgentsTab();
+}
+
 // ── Language ──────────────────────────────────────────────
 function applyLang(lang){
   currentLang = lang;
@@ -1805,6 +2069,8 @@ applyTheme(savedTheme);
   if (!currentUser) return;
   applyLang(currentLang);
   await migrateFromLocalStorage();
+  await loadCustomAgents();
+  renderAgents();
   loadModels();
 })();
 </script>

@@ -237,18 +237,31 @@ app.delete('/api/favourites/*', requireAuth, (req, res) => {
 
 // ── Agents ────────────────────────────────────────────────
 app.get('/api/agents', requireAuth, (req, res) => {
-  const rows = db.prepare('SELECT data FROM agents WHERE user_id = ?').all(req.session.userId);
-  res.json(rows.map(r => JSON.parse(r.data)));
+  const rows = db.prepare('SELECT id, data FROM agents').all();
+  res.json(rows.map(r => {
+    const d = JSON.parse(r.data);
+    d.id = String(r.id).replace(/^custom-/, '');
+    return d;
+  }));
 });
 
-app.post('/api/agents', requireAuth, (req, res) => {
+app.post('/api/agents', requireAuth, requireAdmin, (req, res) => {
   const agent = req.body;
   db.prepare('INSERT OR REPLACE INTO agents (id, data, user_id) VALUES (?, ?, ?)').run(agent.id, JSON.stringify(agent), req.session.userId);
   res.json({ ok: true });
 });
 
-app.delete('/api/agents/:id', requireAuth, (req, res) => {
-  db.prepare('DELETE FROM agents WHERE id = ? AND user_id = ?').run(req.params.id, req.session.userId);
+app.put('/api/agents/:id', requireAuth, requireAdmin, (req, res) => {
+  const rawId = req.params.id.replace(/^custom-/, '');
+  const agent = req.body;
+  db.prepare('UPDATE agents SET data = ? WHERE id = ? OR id = ?')
+    .run(JSON.stringify(agent), rawId, `custom-${rawId}`);
+  res.json({ ok: true });
+});
+
+app.delete('/api/agents/:id', requireAuth, requireAdmin, (req, res) => {
+  const rawId = req.params.id.replace(/^custom-/, '');
+  db.prepare('DELETE FROM agents WHERE id = ? OR id = ?').run(rawId, `custom-${rawId}`);
   res.json({ ok: true });
 });
 

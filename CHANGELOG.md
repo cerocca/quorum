@@ -1,5 +1,20 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.5.0 — Custom agents
+*2026-05-30*
+
+- Bias list expanded: added `empirical` (pink chip) and `custom` (grey chip, placeholder for future custom bias)
+- All 6 built-in bias chips now have distinct colours — each label has a unique background/text combination
+- Custom agent form in Settings > Agents: name (EN + ITA), description (EN + ITA), bias, colour, system prompt (EN + ITA), optional model override
+- Custom agents appear in agent grid alongside the 6 built-in ones, with ✎ edit badge
+- Custom agents scoped by user_id, persisted in SQLite (table `agents`)
+- Model override for custom agents only — built-in agents always use the global model
+- Settings > Agents: built-in agent viewer — all 6 agents expandable with full system prompt
+- Settings > Agents: export all built-in agent prompts as quorum-std-agent-prompts.md
+- Settings > Agents: collapsible prompt-writing guide with download as .md
+- Bug fix: custom agent edit was silently creating a new agent instead of updating — fixed by replacing DOM-based id tracking with in-memory editingAgentId variable and stripping custom- prefix before API calls
+- Google Fonts restored (Syne + IBM Plex Mono) — local font files removed
+
 ## v0.4.8 — Auth + Profiles
 *2026-05-30*
 

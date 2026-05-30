@@ -123,5 +123,5 @@ ss -tlnp | grep 3003           # verify port
 
 ## Current version
 
-v0.4.8 — Auth + Profiles
+v0.5.0 — Custom agents
 See CHANGELOG.md for full history.
