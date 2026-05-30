@@ -17,13 +17,15 @@ Legend: `[ ]` open · `[x]` done · `[~]` in progress · `[-]` discarded
 ---
 
 ## v0.4.8 — Auth + Profiles
-- [ ] Login page: username + password, cookie session
-- [ ] User table in SQLite: id, username, password_hash, is_admin
-- [ ] All data scoped by user_id: history, favourites, profiles
-- [ ] Profile CRUD: name + free text, shown in Profiles tab
-- [ ] Active profile selector before run (last used remembered)
-- [ ] Profile injected into agent system prompts at run time
-- [ ] Profile saved with session in history
+- [x] Login page: username + password, cookie session
+- [x] User table in SQLite: id, username, password_hash, is_admin
+- [x] All data scoped by user_id: history, favourites, profiles
+- [x] Profile CRUD: name + free text, shown in Profiles tab
+- [x] Active profile selector before run (last used remembered)
+- [x] Profile injected into agent system prompts at run time
+- [x] Profile saved with session in history
+- [x] Admin tab user management (admin only)
+- [x] Account update: username and password change in Settings > Admin
 
 ---
 

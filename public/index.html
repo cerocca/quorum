@@ -5,10 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖</text></svg>"/>
 <title>Quorum</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/syne-400.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/syne-600.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/syne-700.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-500.ttf') format('truetype');
+}
 *{box-sizing:border-box;margin:0;padding:0}
+button, input, textarea, select{font-family:inherit;}
 :root{
   --bg:#f8f8f6;
   --surface:#ffffff;
@@ -308,7 +342,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       </div>
       <div class="model-selected-label" id="modelSelectedLabel" style="display:none"></div>
     </div>
-    <button class="load-models-btn" id="loadModelsBtn" onclick="modelDropdown.classList.remove('open');loadModels()">↻ Load models</button>
+    <button class="load-models-btn" id="loadModelsBtn" onclick="loadModels(true)">↻ Load models</button>
   </div>
 
   <p class="model-lede" id="modelLede">A single reasoning model is assigned to all six agents, so disagreement is structural — not architectural.</p>
@@ -389,8 +423,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
   <footer class="page-footer">
     <div class="page-footer-left">
-      <div class="avatar-circle">CI</div>
-      <span>ciru</span>
+      <div class="avatar-circle" id="footerAvatar">CI</div>
+      <span id="footerUsername">ciru</span>
     </div>
     <div class="page-footer-right">
       <a href="https://github.com/cerocca/quorum" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>v0.4.7</span></a>
@@ -471,8 +505,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
   </div>
   <div class="drawer-footer">
     <div class="drawer-user">
-      <div class="avatar-circle">CI</div>
-      <span class="drawer-username">ciru</span>
+      <div class="avatar-circle" id="drawerAvatar">CI</div>
+      <span class="drawer-username" id="drawerUsername">ciru</span>
     </div>
   </div>
 </div>
@@ -595,6 +629,8 @@ const STRINGS = {
 };
 
 let currentLang = localStorage.getItem('quorum-lang') || 'ita';
+let currentUser = null;
+let activeProfile = null;
 
 // ── Bias chips ────────────────────────────────────────────
 const BIAS_CHIP = {
@@ -731,9 +767,9 @@ const modelDropdown  = document.getElementById('modelDropdown');
 const modelLabel     = document.getElementById('modelSelectedLabel');
 modelSearchEl.value  = '';
 
-async function loadModels(){
+async function loadModels(openDropdown = false){
   modelDropdown.innerHTML = '<div class="model-status">Loading…</div>';
-  modelDropdown.classList.add('open');
+  if(openDropdown) modelDropdown.classList.add('open');
   try{
     const r = await fetch('/api/models');
     const d = await r.json();
@@ -942,7 +978,7 @@ async function runPanel(){
     const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
       const {text, cost} = await callProxy([
-        {role:'system', content: agentSystem},
+        {role:'system', content: injectProfile(agentSystem)},
         {role:'user',   content: decisionBlock}
       ], 1200);
       sessionCost += cost;
@@ -970,7 +1006,7 @@ async function runPanel(){
     synthBody.textContent = S.synthesizing;
     try{
       const {text: synth, cost: synthCost} = await callProxy([
-        {role:'system', content: synthSys},
+        {role:'system', content: injectProfile(synthSys)},
         {role:'user',   content: synthPromptFn(decision, analysesBlock, '')}
       ], 2000);
       sessionCost += synthCost;
@@ -984,7 +1020,8 @@ async function runPanel(){
       synthDot.textContent = '✓'; synthDot.style.cssText = 'color:#2a9d5c';
       if(sessionCost){ const ce=document.getElementById('runCostEl'); if(ce){ce.textContent=formatCost(sessionCost);ce.style.display='';} }
       currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
-        agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[],cost:sessionCost};
+        agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[],cost:sessionCost,
+        activeProfile: activeProfile ? { id: activeProfile.id, name: activeProfile.name } : null};
       saveSession(currentSession);
       document.getElementById('exportBtn').style.display = '';
     }catch(e){
@@ -1004,7 +1041,7 @@ async function runPanel(){
   let critique = '';
   try{
     const {text: critiqueText, cost: critCost} = await callProxy([
-      {role:'system', content: critSys},
+      {role:'system', content: injectProfile(critSys)},
       {role:'user',   content: critPromptFn(decision, analysesBlock)}
     ], 2000);
     sessionCost += critCost;
@@ -1026,7 +1063,7 @@ async function runPanel(){
   let synthText = '';
   try{
     const {text: synth, cost: synthCost} = await callProxy([
-      {role:'system', content: synthSys},
+      {role:'system', content: injectProfile(synthSys)},
       {role:'user',   content: synthPromptFn(decision, analysesBlock, critique)}
     ], 2000);
     sessionCost += synthCost;
@@ -1065,7 +1102,7 @@ async function runPanel(){
     const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
       const {text, cost} = await callProxy([
-        {role:'system', content: agentSystem},
+        {role:'system', content: injectProfile(agentSystem)},
         {role:'user',   content: S.premortPrompt(a.name, a.bias, decisionBlock)}
       ], 1200);
       sessionCost += cost;
@@ -1086,7 +1123,8 @@ async function runPanel(){
     if(sessionCost){ const costEl=document.getElementById('runCostEl'); if(costEl){costEl.textContent=formatCost(sessionCost);costEl.style.display='';} }
     currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
       agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique,synthesis:synthText,
-      premortem:agents.map(a=>({id:a.id,name:a.name,output:pmResults[a.id]||''})),cost:sessionCost};
+      premortem:agents.map(a=>({id:a.id,name:a.name,output:pmResults[a.id]||''})),cost:sessionCost,
+      activeProfile: activeProfile ? { id: activeProfile.id, name: activeProfile.name } : null};
     saveSession(currentSession);
     document.getElementById('exportBtn').style.display = '';
   }
@@ -1338,6 +1376,365 @@ function switchSettingsTab(tabId){
   document.querySelectorAll('.settings-tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('stab-'+tabId).classList.add('active');
   document.getElementById('stab-panel-'+tabId).classList.add('active');
+  if(tabId === 'profiles') renderProfilesTab();
+  if(tabId === 'admin') renderAdminTab();
+}
+
+// ── Auth ──────────────────────────────────────────────────
+async function checkAuth() {
+  try {
+    const r = await fetch('/api/auth/me');
+    if (r.status === 401) { window.location.href = '/login'; return; }
+    const me = await r.json();
+    currentUser = { username: me.username, isAdmin: me.isAdmin, activeProfileId: me.activeProfileId };
+    updateFooterUser();
+    await loadActiveProfile();
+  } catch(e) {
+    window.location.href = '/login';
+  }
+}
+
+async function signOut() {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  window.location.href = '/login';
+}
+
+function updateFooterUser() {
+  const el = document.getElementById('footerUsername');
+  if (el && currentUser) el.textContent = currentUser.username;
+  const du = document.getElementById('drawerUsername');
+  if (du && currentUser) du.textContent = currentUser.username;
+  const initial = currentUser ? currentUser.username[0].toUpperCase() : '';
+  const fa = document.getElementById('footerAvatar');
+  if (fa && initial) fa.textContent = initial;
+  const da = document.getElementById('drawerAvatar');
+  if (da && initial) da.textContent = initial;
+}
+
+async function loadActiveProfile() {
+  if (!currentUser?.activeProfileId) { activeProfile = null; return; }
+  try {
+    const r = await fetch('/api/profiles');
+    const profiles = await r.json();
+    activeProfile = profiles.find(p => p.id === currentUser.activeProfileId) || null;
+  } catch { activeProfile = null; }
+}
+
+function injectProfile(systemPrompt) {
+  if (!activeProfile) return systemPrompt;
+  return `[Context about the decision-maker:\n${activeProfile.content}]\n\n${systemPrompt}`;
+}
+
+// ── Profiles tab ──────────────────────────────────────────
+async function renderProfilesTab() {
+  const panel = document.getElementById('stab-panel-profiles');
+  panel.innerHTML = '<div class="settings-soon">Loading…</div>';
+  let profiles = [];
+  try {
+    const r = await fetch('/api/profiles');
+    profiles = await r.json();
+  } catch(e) {
+    panel.innerHTML = '<div class="settings-soon">Error loading profiles</div>';
+    return;
+  }
+  let html = '<div style="padding-bottom:4px">';
+  if (profiles.length === 0) {
+    html += '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:8px 0 12px">No profiles yet.</div>';
+  } else {
+    profiles.forEach(p => {
+      const isActive = currentUser?.activeProfileId == p.id;
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-soft)">
+        ${isActive ? '<span style="color:var(--go-text);font-size:12px;flex-shrink:0">●</span>' : '<span style="width:12px;flex-shrink:0"></span>'}
+        <span style="font-family:var(--sans);font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(p.name)}</span>
+        <button onclick="editProfile(${p.id})" title="Edit" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px">✎</button>
+        <button onclick="deleteProfile(${p.id})" title="Delete" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px">✕</button>
+      </div>`;
+    });
+  }
+  html += `<button class="reset-btn" onclick="showProfileForm()" style="margin-top:12px">+ New profile</button>`;
+  html += `<div id="profileForm" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-tint)">
+    <input type="hidden" id="profileFormId" value=""/>
+    <div style="margin-bottom:10px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Name</label>
+      <input class="model-input" id="profileFormName" placeholder="Profile name" style="width:100%"/>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Content</label>
+      <textarea id="profileFormContent" class="model-input" placeholder="Describe your role, company, constraints…" style="width:100%;min-height:80px;resize:vertical;font-size:12px;line-height:1.5;font-family:var(--mono)"></textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="run-btn" onclick="saveProfile()" style="width:auto;padding:9px 18px;margin-bottom:0">Save</button>
+      <button class="reset-btn" onclick="hideProfileForm()">Cancel</button>
+    </div>
+  </div>`;
+  if (profiles.length > 0) {
+    html += `<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-soft)">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Active profile</div>
+      <select class="model-input" id="activeProfileSelect" onchange="changeActiveProfile(this.value)" style="width:100%">
+        <option value="">None</option>
+        ${profiles.map(p => `<option value="${p.id}"${currentUser?.activeProfileId == p.id ? ' selected' : ''}>${escHtml(p.name)}</option>`).join('')}
+      </select>
+    </div>`;
+  }
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function showProfileForm(id, name, content) {
+  document.getElementById('profileFormId').value = id || '';
+  document.getElementById('profileFormName').value = name || '';
+  document.getElementById('profileFormContent').value = content || '';
+  document.getElementById('profileForm').style.display = 'block';
+}
+
+function hideProfileForm() {
+  document.getElementById('profileForm').style.display = 'none';
+}
+
+function editProfile(id) {
+  fetch('/api/profiles').then(r => r.json()).then(profiles => {
+    const p = profiles.find(p => p.id == id);
+    if (p) showProfileForm(p.id, p.name, p.content);
+  });
+}
+
+async function deleteProfile(id) {
+  if (!confirm('Delete this profile?')) return;
+  await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
+  if (currentUser && currentUser.activeProfileId == id) {
+    currentUser.activeProfileId = null;
+    activeProfile = null;
+  }
+  renderProfilesTab();
+}
+
+async function saveProfile() {
+  const id = document.getElementById('profileFormId').value;
+  const name = document.getElementById('profileFormName').value.trim();
+  const content = document.getElementById('profileFormContent').value;
+  if (!name) return;
+  if (id) {
+    await fetch(`/api/profiles/${id}`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, content }),
+    });
+    if (currentUser?.activeProfileId == id) {
+      activeProfile = { ...activeProfile, name, content };
+    }
+  } else {
+    await fetch('/api/profiles', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, content }),
+    });
+  }
+  renderProfilesTab();
+}
+
+async function changeActiveProfile(value) {
+  if (value) {
+    await fetch(`/api/profiles/${value}/activate`, { method: 'PATCH' });
+    currentUser.activeProfileId = parseInt(value);
+  } else {
+    await fetch('/api/profiles/deactivate', { method: 'PATCH' });
+    currentUser.activeProfileId = null;
+  }
+  await loadActiveProfile();
+  renderProfilesTab();
+}
+
+// ── Admin tab ─────────────────────────────────────────────
+function toggleSection(el) {
+  const body = el.nextElementSibling;
+  const chevron = el.querySelector('.sec-chevron');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  chevron.textContent = collapsed ? '▼' : '▶';
+}
+
+async function renderAdminTab() {
+  const panel = document.getElementById('stab-panel-admin');
+  const hdr = 'font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-soft);user-select:none';
+  let html = '<div style="padding-bottom:4px">';
+
+  // Session — visible to all
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Session</span><span class="sec-chevron">▼</span></div>
+  <div style="padding:10px 0 12px">
+    <button class="reset-btn" onclick="signOut()">Sign out</button>
+  </div>`;
+
+  // Account — visible to all
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Account</span><span class="sec-chevron">▼</span></div>
+  <div style="padding:10px 0 12px">
+    <div style="margin-bottom:8px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">New username</label>
+      <input class="model-input" id="accountNewUsername" placeholder="${escHtml(currentUser?.username||'')}" style="width:100%"/>
+    </div>
+    <div style="margin-bottom:8px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">New password</label>
+      <input class="model-input" type="password" id="accountNewPassword" style="width:100%"/>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Confirm password</label>
+      <input class="model-input" type="password" id="accountConfirmPassword" style="width:100%"/>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="reset-btn" onclick="updateAccount()">Update</button>
+      <span id="accountMsg" style="font-family:var(--mono);font-size:11px"></span>
+    </div>
+  </div>`;
+
+  if (!currentUser?.isAdmin) {
+    html += '</div>';
+    panel.innerHTML = html;
+    toggleSection(panel.querySelectorAll('[onclick="toggleSection(this)"]')[1]);
+    return;
+  }
+
+  // Admin-only: users list + create user
+  let users = [];
+  try {
+    const r = await fetch('/api/admin/users');
+    users = await r.json();
+  } catch(e) {
+    html += `<div style="font-family:var(--mono);font-size:11px;color:var(--danger)">Error loading users</div>`;
+    html += '</div>'; panel.innerHTML = html;
+    toggleSection(panel.querySelectorAll('[onclick="toggleSection(this)"]')[1]);
+    return;
+  }
+
+  html += `<div onclick="toggleSection(this)" style="${hdr}"><span>Users</span><span class="sec-chevron">▼</span></div>
+  <div style="padding-top:4px">`;
+  users.forEach(u => {
+    const isSelf = u.username === currentUser.username;
+    html += `<div id="urow-${u.id}">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-soft)">
+        <span style="font-family:var(--mono);font-size:12px;flex:1">${escHtml(u.username)}</span>
+        ${u.is_admin ? '<span class="bias-chip" style="background:var(--chip-investigative-bg);color:var(--chip-investigative-tx)">admin</span>' : ''}
+        ${!isSelf ? `
+          <button onclick="showResetPwd(${u.id})" style="background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer">Reset pwd</button>
+          <button onclick="deleteUser(${u.id})" title="Delete" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px">✕</button>
+        ` : ''}
+      </div>
+      ${!isSelf ? `<div id="rpwd-${u.id}" style="display:none;padding:8px 0 10px;border-bottom:1px solid var(--border-soft)">
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="password" id="rpwd-input-${u.id}" class="model-input" placeholder="New password" style="flex:1"/>
+          <button onclick="confirmResetPwd(${u.id})" style="background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer">Confirm</button>
+          <button onclick="hideResetPwd(${u.id})" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px">✕</button>
+        </div>
+        <div id="rpwd-msg-${u.id}" style="font-family:var(--mono);font-size:11px;margin-top:5px"></div>
+      </div>` : ''}
+    </div>`;
+  });
+  html += `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-soft)">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">New user</div>
+    <div style="margin-bottom:8px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Username</label>
+      <input class="model-input" id="adminNewUsername" style="width:100%"/>
+    </div>
+    <div style="margin-bottom:8px">
+      <label style="display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Password</label>
+      <input class="model-input" type="password" id="adminNewPassword" style="width:100%"/>
+    </div>
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="adminNewIsAdmin"/>
+      <label for="adminNewIsAdmin" style="font-family:system-ui,sans-serif;font-size:13px;color:var(--text);cursor:pointer">Admin</label>
+    </div>
+    <button class="reset-btn" onclick="createUser()">Create user</button>
+  </div></div>`;
+  html += '</div>';
+  panel.innerHTML = html;
+  const secHdrs = panel.querySelectorAll('[onclick="toggleSection(this)"]');
+  toggleSection(secHdrs[1]); // Account
+  toggleSection(secHdrs[2]); // Users
+}
+
+async function updateAccount() {
+  const username = document.getElementById('accountNewUsername').value.trim();
+  const password = document.getElementById('accountNewPassword').value;
+  const confirm  = document.getElementById('accountConfirmPassword').value;
+  const msg = document.getElementById('accountMsg');
+  if (!username && !password) return;
+  if (password && password !== confirm) {
+    msg.style.color = 'var(--danger)'; msg.textContent = 'Passwords do not match'; return;
+  }
+  const body = {};
+  if (username) body.username = username;
+  if (password) body.password = password;
+  const r = await fetch('/api/auth/update', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  });
+  const d = await r.json();
+  if (r.ok) {
+    if (body.username) { currentUser.username = d.username; updateFooterUser(); }
+    msg.style.color = 'var(--go-text)'; msg.textContent = 'Saved';
+    document.getElementById('accountNewUsername').value = '';
+    document.getElementById('accountNewPassword').value = '';
+    document.getElementById('accountConfirmPassword').value = '';
+  } else {
+    msg.style.color = 'var(--danger)'; msg.textContent = d.error || 'Error';
+  }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user? This will also delete all their data.')) return;
+  await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+  renderAdminTab();
+}
+
+function showResetPwd(id) {
+  document.getElementById(`rpwd-${id}`).style.display = '';
+  document.getElementById(`rpwd-input-${id}`).focus();
+}
+
+function hideResetPwd(id) {
+  document.getElementById(`rpwd-${id}`).style.display = 'none';
+  document.getElementById(`rpwd-input-${id}`).value = '';
+  document.getElementById(`rpwd-msg-${id}`).textContent = '';
+}
+
+async function confirmResetPwd(id) {
+  const input = document.getElementById(`rpwd-input-${id}`);
+  const msg = document.getElementById(`rpwd-msg-${id}`);
+  const password = input.value;
+  if (!password) { msg.style.color = 'var(--danger)'; msg.textContent = 'Password required'; return; }
+  const r = await fetch(`/api/admin/users/${id}/password`, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ password }),
+  });
+  if (r.ok) {
+    msg.style.color = 'var(--go-text)'; msg.textContent = 'Done';
+    input.value = '';
+    setTimeout(() => hideResetPwd(id), 2000);
+  } else {
+    const d = await r.json();
+    msg.style.color = 'var(--danger)'; msg.textContent = d.error || 'Error';
+  }
+}
+
+async function createUser() {
+  const username = document.getElementById('adminNewUsername').value.trim();
+  const password = document.getElementById('adminNewPassword').value;
+  const isAdmin = document.getElementById('adminNewIsAdmin').checked;
+  if (!username || !password) return;
+  const r = await fetch('/api/admin/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ username, password, isAdmin }),
+  });
+  if (r.ok) {
+    document.getElementById('adminNewUsername').value = '';
+    document.getElementById('adminNewPassword').value = '';
+    document.getElementById('adminNewIsAdmin').checked = false;
+    renderAdminTab();
+  } else {
+    const d = await r.json();
+    alert(d.error || 'Error creating user');
+  }
 }
 
 // ── Language ──────────────────────────────────────────────
@@ -1436,9 +1833,13 @@ function applyTheme(theme){
 const savedTheme = localStorage.getItem('quorum-theme') || 'light';
 applyTheme(savedTheme);
 
-applyLang(currentLang);
-migrateFromLocalStorage();
-loadModels();
+(async () => {
+  await checkAuth();
+  if (!currentUser) return;
+  applyLang(currentLang);
+  await migrateFromLocalStorage();
+  loadModels();
+})();
 </script>
 </body>
 </html>

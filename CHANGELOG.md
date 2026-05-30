@@ -1,5 +1,27 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.4.8 — Auth + Profiles
+*2026-05-30*
+
+- Login page (public/login.html): Quorum design system, local fonts (Syne + IBM Plex Mono served from /public/fonts/)
+- Cookie-based authentication: express-session + connect-sqlite3, sessions persisted in SQLite
+- New table: users (id, username, password_hash, is_admin, active_profile_id, created_at)
+- New table: profiles (id, user_id, name, content, created_at)
+- Admin seed on first boot (ADMIN_USER / ADMIN_PASS from .env, one-shot if users table is empty)
+- Orphan data migration: history and favourites rows without user_id assigned to user_id = 1
+- requireAuth and requireAdmin middleware on all API routes
+- All data (history, favourites, agents) scoped by user_id
+- Auth routes: POST /api/auth/login, POST /api/auth/logout, GET /api/auth/me, POST /api/auth/update
+- Profile routes: GET/POST/PUT/DELETE /api/profiles + PATCH activate/deactivate
+- Admin routes: GET/POST/DELETE /api/admin/users, PATCH /api/admin/users/:id/password
+- index.html: auth check on boot, redirect to /login if unauthenticated
+- index.html: profile injector — active profile prepended to every agent system prompt
+- index.html: Settings > Admin — Sign out, account update (username/password), user management (admin only), password reset for other users, collapsible sections
+- index.html: Settings > Profiles — profile CRUD, active profile selector
+- index.html: avatar shows first letter of username
+- index.html: model dropdown no longer opens automatically on page load
+- Font files served locally to avoid Google Fonts dependency on LAN-only deployments
+
 ## v0.4.7 — Settings drawer with tabs + page footer
 *2026-05-30*
 

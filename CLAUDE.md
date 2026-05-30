@@ -43,7 +43,9 @@ quorum/
 ├── data/              ← volume SQLite (non committare quorum.db)
 │   └── quorum.db      ← generato a runtime, in .gitignore
 └── public/
-    └── index.html     ← frontend single-file
+    ├── index.html     ← frontend single-file
+    ├── login.html     ← login page
+    └── fonts/         ← local font files (not committed — downloaded at deploy time)
 ```
 
 ---
@@ -98,6 +100,9 @@ Esempio: `v0.4.5 — migrazione SQLite per history e favourites`
 OR_KEY=sk-or-...          # API key OpenRouter
 DEFAULT_MODEL=google/gemini-2.5-flash-preview-05-20
 PORT=3003
+SESSION_SECRET=change-me-in-production
+ADMIN_USER=admin
+ADMIN_PASS=changeme
 ```
 
 `DEFAULT_MODEL` è il fallback lato server se il client non specifica un modello.
@@ -127,7 +132,7 @@ ss -tlnp | grep 3003
 ## Versioni
 
 Vedi `CHANGELOG.md` per la storia completa.
-Versione corrente: **v0.4.5** — migrazione SQLite per history e favourites.
+Versione corrente: **v0.4.8** — Auth + Profiles.
 
 ---
 

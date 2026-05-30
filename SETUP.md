@@ -28,6 +28,20 @@
 
 http://sibilla:3003  (or http://<sibilla-ip>:3003)
 
+## First run
+
+On first boot, an admin user is created automatically if the users table is empty.
+Credentials are read from .env:
+
+```
+ADMIN_USER=admin
+ADMIN_PASS=your-password
+SESSION_SECRET=change-me-in-production
+```
+
+Change these before deploying. After first login, credentials can be updated via Settings > Admin.
+Update SESSION_SECRET in .env before any non-local deployment.
+
 ## Useful commands
 
 docker compose down          # stop
