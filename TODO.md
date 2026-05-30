@@ -5,9 +5,16 @@ Legend: `[ ]` open · `[x]` done · `[~]` in progress · `[-]` discarded
 ---
 
 ## v0.5.0 — Custom agents
-- [ ] Custom agent form in Agents tab: name, bias, colour, system prompt, optional model override
+
+- [ ] Bias list expanded: add `empirical` (orange chip) and `custom` (grey chip, placeholder for future custom bias)
+- [ ] Custom agent form in Agents tab: name, bias (from fixed list), colour (free, independent from bias), system prompt, optional model override
 - [ ] Custom agents appear in agent grid alongside the 6 built-in ones
-- [ ] Full CRUD via /api/agents
+- [ ] Custom agents scoped by user_id, persisted in SQLite (table `agents` already scaffolded)
+- [ ] Model override for custom agents only — built-in agents always use the global model
+- [ ] Settings > Agents: view built-in agent config (name, bias, full system prompt, expandable)
+- [ ] Settings > Agents: export all built-in agent prompts as .md
+- [ ] Settings > Agents: collapsible prompt-writing guide (how to write agent system prompts, with examples from built-ins)
+- [ ] Settings > Agents: download guide as .md
 
 ---
 
