@@ -17,7 +17,6 @@ Legend: `[ ]` open · `[x]` done · `[~]` in progress · `[-]` discarded
 - [ ] Devil's Panel mode — all agents with skeptic bias
 - [ ] Telegram webhook notification on run complete
 - [ ] Solo mode: query a single agent, no verdict
-- [ ] Per-agent model override (mix models in a single run)
 
 ---
 
