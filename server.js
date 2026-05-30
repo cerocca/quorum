@@ -29,6 +29,11 @@ db.exec(`
   );
 `);
 
+const histCols = db.prepare("PRAGMA table_info(history)").all();
+if (!histCols.find(c => c.name === 'cost')) {
+  db.exec("ALTER TABLE history ADD COLUMN cost REAL DEFAULT 0");
+}
+
 app.use(express.json());
 app.use(express.static(join(__dirname, 'public')));
 
@@ -77,13 +82,13 @@ app.post('/api/chat', async (req, res) => {
 
 // ── History ───────────────────────────────────────────────
 app.get('/api/history', (req, res) => {
-  const rows = db.prepare('SELECT data FROM history ORDER BY created_at DESC').all();
-  res.json(rows.map(r => JSON.parse(r.data)));
+  const rows = db.prepare('SELECT data, cost FROM history ORDER BY created_at DESC').all();
+  res.json(rows.map(r => { const s = JSON.parse(r.data); if (!s.cost && r.cost) s.cost = r.cost; return s; }));
 });
 
 app.post('/api/history', (req, res) => {
   const session = req.body;
-  db.prepare('INSERT OR REPLACE INTO history (id, data, created_at) VALUES (?, ?, ?)').run(session.id, JSON.stringify(session), session.id);
+  db.prepare('INSERT OR REPLACE INTO history (id, data, cost, created_at) VALUES (?, ?, ?, ?)').run(session.id, JSON.stringify(session), session.cost || 0, session.id);
   res.json({ ok: true });
 });
 

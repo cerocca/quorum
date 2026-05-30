@@ -155,6 +155,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
 
 .reset-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:pointer;margin-top:8px;transition:all .15s}
 .reset-btn:hover{border-color:var(--text);color:var(--text)}
+#runCostEl{background:transparent;border:1px solid var(--border);color:var(--text-soft);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:4px;cursor:default;margin-top:8px}
 
 /* Collapsible cards */
 .agent-chevron{margin-left:auto;font-size:10px;color:var(--muted);user-select:none}
@@ -348,9 +349,10 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-hei
       <div id="premortOutputs" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between">
       <button class="reset-btn" id="resetBtn" onclick="resetPanel()">← New decision</button>
       <button class="reset-btn" id="exportBtn" onclick="exportSession()" style="display:none">↓ Export session</button>
+      <span id="runCostEl" style="display:none"></span>
     </div>
   </div>
 
@@ -826,7 +828,12 @@ async function callProxy(messages, max_tokens){
   });
   const d = await r.json();
   if(d.error) throw new Error(d.error.message||'API error');
-  return d.choices[0].message.content;
+  return { text: d.choices[0].message.content, cost: d.usage?.cost || 0 };
+}
+
+function formatCost(c){
+  if(!c) return '';
+  return 'Run cost: ' + (c > 0.01 ? `$${c.toFixed(4)}` : `$${c.toFixed(6)}`);
 }
 
 // ── Run panel ─────────────────────────────────────────────
@@ -840,12 +847,15 @@ async function runPanel(){
 
   currentSession = null;
   document.getElementById('exportBtn').style.display = 'none';
+  const _costElReset = document.getElementById('runCostEl');
+  if(_costElReset){ _costElReset.textContent = ''; _costElReset.style.display = 'none'; }
   document.getElementById('pipeline').style.display = 'flex';
   document.getElementById('runBtn').disabled = true;
   document.getElementById('phase2').style.display = selectedTier === 'quick' ? 'none' : '';
   document.getElementById('phase4').style.display = selectedTier === 'quick' ? 'none' : '';
   window.scrollBy({top:200,behavior:'smooth'});
 
+  let sessionCost = 0;
   const agents = AGENTS.filter(a => selectedAgents.has(a.id));
   const context = document.getElementById('contextInput').value.trim();
   const decisionBlock = `Decision: ${decision}${context?'\n\nContext: '+context:''}`;
@@ -877,12 +887,13 @@ async function runPanel(){
   await Promise.all(agents.map(async a=>{
     const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
-      const res = await callProxy([
+      const {text, cost} = await callProxy([
         {role:'system', content: agentSystem},
         {role:'user',   content: decisionBlock}
       ], 1200);
-      results[a.id] = res;
-      document.getElementById(`ab-${a.id}`).textContent = res;
+      sessionCost += cost;
+      results[a.id] = text;
+      document.getElementById(`ab-${a.id}`).textContent = text;
       document.getElementById(`ab-${a.id}`).classList.remove('empty');
       const card = document.getElementById(`ao-${a.id}`);
       card.className = 'agent-out done collapsed';
@@ -904,10 +915,11 @@ async function runPanel(){
     synthBody.classList.remove('empty');
     synthBody.textContent = S.synthesizing;
     try{
-      const synth = await callProxy([
+      const {text: synth, cost: synthCost} = await callProxy([
         {role:'system', content: synthSys},
         {role:'user',   content: synthPromptFn(decision, analysesBlock, '')}
       ], 2000);
+      sessionCost += synthCost;
       const firstLine = synth.split('\n')[0]||'';
       let vclass = 'conditional';
       if(/\bGO\b/.test(firstLine) && !/NO-GO/.test(firstLine)) vclass = 'go';
@@ -916,8 +928,9 @@ async function runPanel(){
       synthBody.innerHTML = `<div class="verdict-pill ${vclass}">${firstLine.replace(/^VERDICT:\s*/i,'').trim()}</div>` +
         `<div style="white-space:pre-wrap">${synth.split('\n').slice(1).join('\n').trim()}</div>`;
       synthDot.textContent = '✓'; synthDot.style.cssText = 'color:#2a9d5c';
+      if(sessionCost){ const ce=document.getElementById('runCostEl'); if(ce){ce.textContent=formatCost(sessionCost);ce.style.display='';} }
       currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
-        agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[]};
+        agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique:'',synthesis:synth,premortem:[],cost:sessionCost};
       saveSession(currentSession);
       document.getElementById('exportBtn').style.display = '';
     }catch(e){
@@ -936,10 +949,12 @@ async function runPanel(){
 
   let critique = '';
   try{
-    critique = await callProxy([
+    const {text: critiqueText, cost: critCost} = await callProxy([
       {role:'system', content: critSys},
       {role:'user',   content: critPromptFn(decision, analysesBlock)}
     ], 2000);
+    sessionCost += critCost;
+    critique = critiqueText;
     critBody.textContent = critique;
     critDot.textContent = '✓'; critDot.style.cssText = 'color:#2a9d5c';
   }catch(e){
@@ -956,10 +971,11 @@ async function runPanel(){
 
   let synthText = '';
   try{
-    const synth = await callProxy([
+    const {text: synth, cost: synthCost} = await callProxy([
       {role:'system', content: synthSys},
       {role:'user',   content: synthPromptFn(decision, analysesBlock, critique)}
     ], 2000);
+    sessionCost += synthCost;
     synthText = synth;
     const firstLine = synth.split('\n')[0]||'';
     let vclass = 'conditional';
@@ -994,12 +1010,13 @@ async function runPanel(){
   await Promise.all(agents.map(async a=>{
     const agentSystem = currentLang === 'ita' ? a.system_ita : a.system;
     try{
-      const res = await callProxy([
+      const {text, cost} = await callProxy([
         {role:'system', content: agentSystem},
         {role:'user',   content: S.premortPrompt(a.name, a.bias, decisionBlock)}
       ], 1200);
-      pmResults[a.id] = res;
-      document.getElementById(`pb-${a.id}`).textContent = res;
+      sessionCost += cost;
+      pmResults[a.id] = text;
+      document.getElementById(`pb-${a.id}`).textContent = text;
       document.getElementById(`pb-${a.id}`).classList.remove('empty');
       const card = document.getElementById(`pm-${a.id}`);
       card.className = 'agent-out done collapsed';
@@ -1012,9 +1029,10 @@ async function runPanel(){
   }));
 
   if(synthText){
+    if(sessionCost){ const costEl=document.getElementById('runCostEl'); if(costEl){costEl.textContent=formatCost(sessionCost);costEl.style.display='';} }
     currentSession = {id:Date.now(),date:new Date().toISOString(),decision,context,model:selectedModel,tier:selectedTier,judge:selectedMode,
       agents:agents.map(a=>({id:a.id,name:a.name,output:results[a.id]||''})),critique,synthesis:synthText,
-      premortem:agents.map(a=>({id:a.id,name:a.name,output:pmResults[a.id]||''}))};
+      premortem:agents.map(a=>({id:a.id,name:a.name,output:pmResults[a.id]||''})),cost:sessionCost};
     saveSession(currentSession);
     document.getElementById('exportBtn').style.display = '';
   }
@@ -1098,12 +1116,13 @@ function renderHistoryDrawer(){
     const verdictHtml = verdict ? `<span class="hist-verdict ${verdict}">${verdict==='nogo'?'NO-GO':verdict.toUpperCase()}</span>` : '';
     const modelShort = s.model ? s.model.split('/').pop() : '';
     const firstLine = (s.decision||'').split('\n')[0];
+    const costStr = s.cost ? ' · ' + (s.cost > 0.01 ? `$${s.cost.toFixed(4)}` : `$${s.cost.toFixed(6)}`) : '';
     return `<div class="hist-entry" id="he-${s.id}">
       <input type="checkbox" class="hist-entry-cb" data-id="${s.id}" onchange="updateDelSelBtn()" onclick="event.stopPropagation()">
       <div class="hist-entry-body" onclick="restoreSession('${s.id}')" title="${escHtml(s.decision)}">
         <div class="hist-entry-date">${escHtml(dateStr)}</div>
         <div class="hist-entry-decision">${escHtml(firstLine)}</div>
-        <div class="hist-entry-meta">${verdictHtml}<span style="font-family:var(--mono);font-size:9px;color:var(--muted)">${escHtml(s.tier||'')} · ${escHtml(modelShort)}</span></div>
+        <div class="hist-entry-meta">${verdictHtml}<span style="font-family:var(--mono);font-size:9px;color:var(--muted)">${escHtml(s.tier||'')} · ${escHtml(modelShort)}${costStr}</span></div>
       </div>
       <button class="hist-del-btn" onclick="event.stopPropagation();deleteEntry('${s.id}')" title="Delete">&#xD7;</button>
     </div>`;
@@ -1198,6 +1217,7 @@ function restoreSession(id){
       `<div style="white-space:pre-wrap">${s.synthesis.split('\n').slice(1).join('\n').trim()}</div>`;
     const synthDotEl = document.getElementById('synthDot');
     synthDotEl.textContent = '✓'; synthDotEl.style.cssText = 'color:#2a9d5c';
+    const rce=document.getElementById('runCostEl'); if(rce){ if(s.cost){rce.textContent=formatCost(s.cost);rce.style.display='';}else{rce.style.display='none';} }
   }
 
   if(s.premortem && s.premortem.length){
@@ -1238,7 +1258,8 @@ function exportSession(){
     '',
   ];
   if(s.context) lines.push(`**Context:** ${s.context}`, '');
-  lines.push(`**Model:** ${s.model}`, `**Tier:** ${s.tier}`, `**Judge:** ${s.judge}`, '', '---', '', '## Phase 1 — Agent Analysis', '');
+  const costExport = s.cost ? (s.cost > 0.01 ? `$${s.cost.toFixed(4)}` : `$${s.cost.toFixed(6)}`) : '$0.000000';
+  lines.push(`**Model:** ${s.model}`, `**Cost:** ${costExport}`, `**Tier:** ${s.tier}`, `**Judge:** ${s.judge}`, '', '---', '', '## Phase 1 — Agent Analysis', '');
   (s.agents||[]).forEach(a=>{ lines.push(`### ${a.name}`, '', a.output||'', ''); });
   if(s.critique) lines.push('---', '', '## Phase 2 — Cross-Critique', '', s.critique, '');
   if(s.synthesis) lines.push('---', '', '## Phase 3 — Synthesis', '', s.synthesis, '');
