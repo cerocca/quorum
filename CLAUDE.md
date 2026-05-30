@@ -27,6 +27,8 @@ Deploy target: self-hosted server, Docker, typically LAN-only.
 ---
 
 ## Repo structure
+
+```
 quorum/
 ├── CLAUDE.md          ← this file
 ├── CHANGELOG.md       ← version history
@@ -47,6 +49,7 @@ quorum/
 └── public/
     ├── index.html     ← main single-file frontend
     └── login.html     ← login page
+```
 
 ---
 
