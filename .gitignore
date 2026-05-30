@@ -4,3 +4,4 @@ node_modules/
 data/quorum.db
 ._*
 public/fonts/
+._*
