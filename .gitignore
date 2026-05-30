@@ -1,7 +1,7 @@
 node_modules/
 .env
 .DS_Store
-data/quorum.db
+data/
 ._*
 public/fonts/
 ._*
