@@ -25,6 +25,7 @@ Legend: `[ ]` open · `[x]` done · `[~]` in progress · `[-]` discarded
 - [ ] Devil's Panel mode — all agents with skeptic bias
 - [ ] Telegram webhook notification on run complete
 - [ ] Solo mode: query a single agent, no verdict
+- [ ] Profile language: support EN + ITA fields (like custom agents) and inject the correct version based on active UI language
 
 ---
 

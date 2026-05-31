@@ -1494,7 +1494,13 @@ async function renderProfilesTab() {
       </div>`;
     });
   }
-  html += `<button class="reset-btn" onclick="showProfileForm()" style="margin-top:12px">+ New profile</button>`;
+  html += `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
+    <button class="reset-btn" onclick="showProfileForm()">+ New profile</button>
+    <button class="reset-btn" onclick="exportProfiles()">↓ Export profiles</button>
+    <button class="reset-btn" onclick="document.getElementById('profileImportInput').click()">↑ Import profiles</button>
+    <input type="file" id="profileImportInput" accept=".json" style="display:none" onchange="importProfiles(this)"/>
+    <span id="profileImportMsg" style="font-family:var(--mono);font-size:11px;color:var(--muted)"></span>
+  </div>`;
   html += `<div id="profileForm" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-tint)">
     <input type="hidden" id="profileFormId" value=""/>
     <div style="margin-bottom:10px">
@@ -1585,6 +1591,59 @@ async function changeActiveProfile(value) {
   }
   await loadActiveProfile();
   renderProfilesTab();
+}
+
+async function exportProfiles() {
+  const r = await fetch('/api/profiles');
+  const profiles = await r.json();
+  const data = profiles.map(p => ({ name: p.name, content: p.content }));
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quorum-profiles.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importProfiles(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    showProfileImportMsg('Invalid file format', true);
+    return;
+  }
+  if (!Array.isArray(data) || !data.every(p => typeof p.name === 'string' && typeof p.content === 'string')) {
+    showProfileImportMsg('Invalid file format', true);
+    return;
+  }
+  const r = await fetch('/api/profiles');
+  const existing = await r.json();
+  const existingNames = new Set(existing.map(p => p.name));
+  let imported = 0;
+  for (const p of data) {
+    if (existingNames.has(p.name)) { console.log(`Import skipped (duplicate): ${p.name}`); continue; }
+    await fetch('/api/profiles', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: p.name, content: p.content }),
+    });
+    imported++;
+  }
+  await renderProfilesTab();
+  showProfileImportMsg(`Imported ${imported} profile${imported !== 1 ? 's' : ''}`);
+}
+
+function showProfileImportMsg(msg, isError) {
+  const el = document.getElementById('profileImportMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+  setTimeout(() => { if (document.getElementById('profileImportMsg')) document.getElementById('profileImportMsg').textContent = ''; }, 3000);
 }
 
 // ── Admin tab ─────────────────────────────────────────────
