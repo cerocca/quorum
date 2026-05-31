@@ -1,5 +1,13 @@
 # CHANGELOG — Quorum Decision Panel
 
+## v0.5.1 — Profile export/import + dynamic version
+*2026-05-31*
+
+- Profile export: download all profiles as quorum-profiles.json
+- Profile import: upload JSON file, validates structure, skips duplicates, shows inline feedback
+- Footer version now loaded dynamically from /api/version (reads package.json) — no more hardcoded version string
+- package.json version set to 0.5.1
+
 ## v0.5.0 — Custom agents
 *2026-05-30*
 

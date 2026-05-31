@@ -123,5 +123,5 @@ ss -tlnp | grep 3003           # verify port
 
 ## Current version
 
-v0.5.0 — Custom agents
+v0.5.1 — Profile export/import, dynamic version
 See CHANGELOG.md for full history.
