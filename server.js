@@ -101,6 +101,11 @@ app.use(express.json());
 // ── Login page (before static, no auth) ──────────────────
 app.get('/login', (req, res) => res.sendFile('login.html', { root: './public' }));
 
+app.get('/api/version', (req, res) => {
+  const { version } = require('./package.json');
+  res.json({ version });
+});
+
 app.use(express.static(join(__dirname, 'public')));
 
 // ── Auth middleware ───────────────────────────────────────
